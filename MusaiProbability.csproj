@@ -43,8 +43,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Card\Card.cs" />
+    <Compile Include="Card\CardLevel.cs" />
+    <Compile Include="Card\HandCardResultJudgement.cs" />
+    <Compile Include="Log\LogWrapper.cs" />
+    <Compile Include="Tool\FileTool.cs" />
+    <Compile Include="Log\Judger.cs" />
+    <Compile Include="Log\Logger.cs" />
+    <Compile Include="Card\Poker.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Tool\StringExtension.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

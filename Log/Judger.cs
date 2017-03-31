@@ -15,10 +15,9 @@ namespace Musai
             draw,
         }
 
-        public static Result Judge(JudgeInfo a, JudgeInfo b)
+        public static Result Judge(HandCardResult a, HandCardResult b)
         {
-            //TODO 优化判断
-            if(a.Level >= CardLevel.other)
+            if(a.Level >= CardLevel.threeCardWithOneJoker)
             {
                 if(a.OnesDigit == b.OnesDigit)
                 {
@@ -30,16 +29,22 @@ namespace Musai
                 return Result.draw;
             }
 
+            //个位数为零 胜 双王
+            if((a.Level == CardLevel.twoJoker) && (b.Level == CardLevel.onesDigitIsZero))
+            {
+                return Result.lose;
+            }
+
             if(a.Level < b.Level)
             {
-                if(b.Level >= CardLevel.other)
+                if(b.Level >= CardLevel.threeCardWithOneJoker)
                 {
                     return Result.win;
                 }
             }
             else if(a.Level == b.Level)
             {
-                if(a.Level >= CardLevel.other)
+                if(a.Level >= CardLevel.threeCardWithOneJoker)
                 {
                     if(a.OnesDigit > b.OnesDigit)
                     {

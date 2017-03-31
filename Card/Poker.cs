@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
+using Tool;
 
 namespace Musai
 {
@@ -22,36 +20,40 @@ namespace Musai
             }
         }
 
-        public const int CARD_NUM = 52;
+        public const int CARD_NUM = 54;
         public static int PER_KIND_NUM = 13;
         private Card[] _cardArray = new Card[CARD_NUM];
         private int _cardIndex = 0;
 
         private Poker()
         {
-            for(int i = 0; i < CARD_NUM; i++)
+            int index;
+            for(index = 0; index < CARD_NUM - 2; index++)
             {
                 Card card = new Card();
-                card.Number = i % PER_KIND_NUM + 1;
-                card.CounterNumber = card.Number;
-                if(card.Number > 10)
+                card.Point = index % PER_KIND_NUM + 1;
+                card.CounterPoint = card.Point;
+                if(card.Point > 10)
                 {
-                    card.CounterNumber = 10;
+                    card.CounterPoint = 10;
                 }
-                card.CardKind = (Card.Kind)(i / PER_KIND_NUM);
-                _cardArray[i] = card;
+                card.CardKind = (Card.Kind)(index / PER_KIND_NUM);
+                _cardArray[index] = card;
             }
+            AddJoker(Card.Kind.redJoker, ref index);
+            AddJoker(Card.Kind.blackJoker, ref index);
         }
 
-        private byte[] _seedBytes = new byte[4];
-        private int GetRandomSeed()
+        private void AddJoker(Card.Kind kind, ref int index)
         {
-            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            rng.GetBytes(_seedBytes);
-            return BitConverter.ToInt32(_seedBytes, 0);
+            Card joker = new Card();
+            joker.CardKind = kind;
+            joker.Point = -1;
+            _cardArray[index] = joker;
+            index++;
         }
 
-        public void SwapCard()
+        public void Shuffle()
         {
             _cardIndex = 0;
             int i = CARD_NUM;
@@ -65,6 +67,19 @@ namespace Musai
                 _cardArray[j] = temp;
             }
         }
+        
+        public Card GetCard()
+        {
+            return _cardArray[_cardIndex++];
+        }
+
+        private byte[] _seedBytes = new byte[4];
+        private int GetRandomSeed()
+        {
+            RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
+            rng.GetBytes(_seedBytes);
+            return BitConverter.ToInt32(_seedBytes, 0);
+        }
 
         //随机性测试
         public void TestRandom()
@@ -72,7 +87,7 @@ namespace Musai
             Dictionary<string, int> _dict = new Dictionary<string, int>();
             for(int i = 0; i < 10000; i++)
             {
-                SwapCard();
+                Shuffle();
                 for(int j = 0; j < 6; j++)
                 {
                     Card card = GetCard();
@@ -87,15 +102,10 @@ namespace Musai
             string content = string.Empty;
             foreach(var key in _dict.Keys)
             {
-                content += string.Format("key:{0} count:{1}\n", key, _dict[key]);
+                content += string.Format("key:{0} count:{1}\n", key.ToCard(), _dict[key]);
             }
-            FileTool.Write("随机性测试数据.txt", content);
+            FileTool.Write("随机性测试数据.dat", content);
         }
 
-        public Card GetCard()
-        {
-            _cardIndex++;
-            return _cardArray[_cardIndex];
-        }
     }
 }
