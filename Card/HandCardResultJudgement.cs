@@ -10,6 +10,11 @@ namespace Musai
     {
         public CardLevel Level;
         public int OnesDigit;
+
+        public override string ToString()
+        {
+            return string.Format("level:" + Level.ToString() + "    onesDigit:" + OnesDigit);
+        }
     }
 
     public class HandCardResultJudgement
@@ -37,10 +42,10 @@ namespace Musai
             _judgeList.Add(new JudgeFunction(CardLevel.straightFlush, IsStraightFlush));
             _judgeList.Add(new JudgeFunction(CardLevel.threeCardWithSamePoint, IsThreeCardWithSamePoint));
             _judgeList.Add(new JudgeFunction(CardLevel.straight, IsStraight));
-            _judgeList.Add(new JudgeFunction(CardLevel.threeCardWithOneJoker, IsThreeCardWithOneJoker));
-            _judgeList.Add(new JudgeFunction(CardLevel.threeCardWithSameKind, IsThreeCardWithSameKind));
-            _judgeList.Add(new JudgeFunction(CardLevel.twoCardWithSameKind, IsTwoCardWithSameKind));
-            _judgeList.Add(new JudgeFunction(CardLevel.twoCardWithSamePoint, IsTwoCardWithSamePoint));
+            //_judgeList.Add(new JudgeFunction(CardLevel.threeCardWithOneJoker, IsThreeCardWithOneJoker));
+            //_judgeList.Add(new JudgeFunction(CardLevel.threeCardWithSameKind, IsThreeCardWithSameKind));
+            //_judgeList.Add(new JudgeFunction(CardLevel.twoCardWithSameKind, IsTwoCardWithSameKind));
+            //_judgeList.Add(new JudgeFunction(CardLevel.twoCardWithSamePoint, IsTwoCardWithSamePoint));
             _judgeList.Add(new JudgeFunction(CardLevel.onesDigitIsZero, IsOnesDigitIsZero));
             _judgeList.Add(new JudgeFunction(CardLevel.other, IsNormal));
         }
@@ -62,7 +67,7 @@ namespace Musai
                     break;
                 }
             }
-            if((int)result.Level >= (int)CardLevel.threeCardWithOneJoker)
+            if(result.Level >= CardLevel.onesDigitIsZero)
             {
                 result.OnesDigit = CalculateOnesDigit(list);
             }
@@ -212,6 +217,10 @@ namespace Musai
 
         private static bool IsOnesDigitIsZero(List<Card> list)
         {
+            if(HaveJoker(list))
+            {
+                return false;
+            }
             int onesDigit = CalculateOnesDigit(list);
             return onesDigit == 0;
         }

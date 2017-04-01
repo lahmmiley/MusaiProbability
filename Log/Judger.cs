@@ -17,42 +17,55 @@ namespace Musai
 
         public static Result Judge(HandCardResult a, HandCardResult b)
         {
-            if(a.Level >= CardLevel.threeCardWithOneJoker)
-            {
-                if(a.OnesDigit == b.OnesDigit)
-                {
-                    return Result.draw;
-                }
-            }
-            else if(a.Level == b.Level)
-            {
-                return Result.draw;
-            }
-
             //个位数为零 胜 双王
-            if((a.Level == CardLevel.twoJoker) && (b.Level == CardLevel.onesDigitIsZero))
+            if((a.Level == CardLevel.onesDigitIsZero) && (b.Level == CardLevel.twoJoker))
             {
-                return Result.lose;
+                return Result.win;
             }
-
-            if(a.Level < b.Level)
+            if(a.Level < b.Level) 
             {
-                if(b.Level >= CardLevel.threeCardWithOneJoker)
+                if (a.Level <= CardLevel.straight)
                 {
                     return Result.win;
                 }
+                else
+                {
+                    return JudgeByOnesDigit(a, b);
+                }
             }
             else if(a.Level == b.Level)
             {
-                if(a.Level >= CardLevel.threeCardWithOneJoker)
+                if(a.Level <= CardLevel.straight)
                 {
-                    if(a.OnesDigit > b.OnesDigit)
-                    {
-                        return Result.win;
-                    }
+                    return Result.draw;
+                }
+                else
+                {
+                    return JudgeByOnesDigit(a, b);
+                }
+            }
+            else
+            {
+                //a.Level > b.level
+                if(b.Level > CardLevel.straight)
+                {
+                    return JudgeByOnesDigit(a, b);
                 }
             }
 
+            return Result.lose;
+        }
+
+        private static Result JudgeByOnesDigit(HandCardResult a, HandCardResult b)
+        {
+            if (a.OnesDigit > b.OnesDigit)
+            {
+                return Result.win;
+            }
+            else if(a.OnesDigit == b.OnesDigit)
+            {
+                return Result.draw;
+            }
             return Result.lose;
         }
     }

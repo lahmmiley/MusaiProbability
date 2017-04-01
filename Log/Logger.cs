@@ -64,7 +64,6 @@ namespace Musai
             {
                 result = Judger.Judge(logWrapperA.ResultOfTwoCard, logWrapperB.ResultOfThreeCard);
                 LogResult(result, resultA.TwoCard, resultB.ThreeCard);
-
             }
 
             result = Judger.Judge(logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfThreeCard);

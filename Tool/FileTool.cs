@@ -18,7 +18,7 @@ namespace Tool
                 Directory.CreateDirectory(RESULT_FOLDER);
             }
             string path = RESULT_FOLDER + fileName;
-            FileStream fs = new FileStream(path, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+            FileStream fs = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
             StreamWriter sw = new StreamWriter(fs);
             sw.Write(content);
             sw.Flush();
