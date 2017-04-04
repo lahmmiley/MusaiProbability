@@ -27,20 +27,23 @@ namespace Musai
             cardList.Add(poker.GetCard());
             cardList.Add(poker.GetCard());
             string hash = GetHash(cardList);
-            HandCardResult resultOfTwoCard = HandCardResultJudgement.GetHandCardResult(cardList);
+            HandCardResult resultOfTwoCard = CardLevelJudgement.GetHandCardResult(cardList);
             cardList.Add(poker.GetCard());
-            HandCardResult resultOfThreeCard = HandCardResultJudgement.GetHandCardResult(cardList);
+            HandCardResult resultOfThreeCard = CardLevelJudgement.GetHandCardResult(cardList);
             return new LogWrapper(hash, resultOfTwoCard, resultOfThreeCard);
         }
 
         private static string GetHash(List<Card> list)
         {
             string hash = string.Empty;
-            for(int i = 0; i < list.Count; i++)
+            list.Sort(Card.Sort);
+            LogKind logKind = LogKindJudgement.GetLogKind(list);
+            if(logKind ==LogKind.oneJoker || logKind == LogKind.twoJoker)
             {
-                hash += list[i].ToString() + " ";
+                return logKind.ToString();
             }
-            return hash;
+            int onesDigit = CardListJudgement.CalculateOnesDigit(list);
+            return onesDigit + " " + logKind;
         }
 
         //可以修改添加的卡牌，测试结果
@@ -50,9 +53,9 @@ namespace Musai
             cardList.Add(new Card(Card.Kind.diamonds, 12));
             cardList.Add(new Card(Card.Kind.club, 1));
             string hash = GetHash(cardList);
-            HandCardResult resultOfTwoCard = HandCardResultJudgement.GetHandCardResult(cardList);
+            HandCardResult resultOfTwoCard = CardLevelJudgement.GetHandCardResult(cardList);
             cardList.Add(new Card(Card.Kind.redJoker, 13));
-            HandCardResult resultOfThreeCard = HandCardResultJudgement.GetHandCardResult(cardList);
+            HandCardResult resultOfThreeCard = CardLevelJudgement.GetHandCardResult(cardList);
             Console.WriteLine(string.Format("{0} {1} {2}", cardList[0].ToCard(), cardList[1].ToCard(), cardList[2].ToCard() ));
             if(resultOfTwoCard == null)
             {

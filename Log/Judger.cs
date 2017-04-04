@@ -45,8 +45,8 @@ namespace Musai
                 }
             }
             else
+            //a.Level > b.level
             {
-                //a.Level > b.level
                 if(b.Level > CardLevel.straight)
                 {
                     return JudgeByOnesDigit(a, b);

@@ -30,14 +30,7 @@ namespace Musai
             int index;
             for(index = 0; index < CARD_NUM - 2; index++)
             {
-                Card card = new Card();
-                card.Point = index % PER_KIND_NUM + 1;
-                card.CounterPoint = card.Point;
-                if(card.Point > 10)
-                {
-                    card.CounterPoint = 10;
-                }
-                card.CardKind = (Card.Kind)(index / PER_KIND_NUM);
+                Card card = new Card((Card.Kind)(index / PER_KIND_NUM), index % PER_KIND_NUM + 1);
                 _cardArray[index] = card;
             }
             AddJoker(Card.Kind.redJoker, ref index);
@@ -46,9 +39,7 @@ namespace Musai
 
         private void AddJoker(Card.Kind kind, ref int index)
         {
-            Card joker = new Card();
-            joker.CardKind = kind;
-            joker.Point = -1;
+            Card joker = new Card(kind, -1);
             _cardArray[index] = joker;
             index++;
         }

@@ -24,8 +24,6 @@ namespace Musai
         public int CounterPoint;//J、Q、K计算时算10点
         public Kind CardKind;
 
-        public Card() { }
-
         public Card(Kind kind, int point)
         {
             this.CardKind = kind;
