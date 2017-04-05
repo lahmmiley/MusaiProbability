@@ -74,43 +74,5 @@ namespace Musai
             rng.GetBytes(seedBytes);
             return BitConverter.ToInt32(seedBytes, 0);
         }
-
-        //随机性测试
-        public void TestRandom(Stopwatch spForSeed)
-        {
-            Dictionary<string, int> _dict = new Dictionary<string, int>();
-            for(int i = 0; i < 1; i++)
-            {
-                Shuffle();
-                for(int j = 0; j < 1; j++)
-                {
-                    Card card = GetCard();
-                    string hash = card.ToString();
-                    if(!_dict.ContainsKey(hash))
-                    {
-                        _dict.Add(hash, 0);
-                    }
-                    _dict[hash] += 1;
-                }
-            }
-            string content = string.Empty;
-            int max = int.MinValue;
-            int min = int.MaxValue;
-            foreach(var key in _dict.Keys)
-            {
-                content += string.Format("key:{0} count:{1}\n", key.ToCard(), _dict[key]);
-                if(_dict[key] > max)
-                {
-                    max = _dict[key];
-                }
-                if(_dict[key] < min)
-                {
-                    min = _dict[key];
-                }
-            }
-            Console.WriteLine("max:" + max + "min:" + min + "\n");
-            FileTool.Write("随机性测试数据.dat", content);
-        }
-
     }
 }

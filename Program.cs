@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using Test;
 
 namespace Musai
 {
@@ -8,13 +9,21 @@ namespace Musai
     {
         static void Main(string[] args)
         {
+            TestUnit testUnit = TestUnit.Singleton;
+            if(!testUnit.TestRandom())
+            {
+                Console.Read();
+                return;
+            }
+
+
             Stopwatch sp = new Stopwatch();
             sp.Start();
             Poker poker = Poker.Singleton;
             Stopwatch spForShuffle = new Stopwatch();
             Stopwatch spForLog = new Stopwatch();
             //TODO 目标一千万
-            for (int i = 0; i < 1000000; i++)
+            for (int i = 0; i < 10000; i++)
             {
                 spForShuffle.Start();
                 poker.Shuffle();

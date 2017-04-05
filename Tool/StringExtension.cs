@@ -1,5 +1,5 @@
 ﻿using System;
-using static Musai.Card;
+using Kind = Musai.Card.Kind;
 
 namespace Tool
 {
