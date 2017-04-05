@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Tool;
 
@@ -42,6 +43,7 @@ namespace Musai
     {
         public Statistics TwoCard = new Statistics();
         public Statistics ThreeCard = new Statistics();
+        public int TotalCount = 0;
     }
 
     public class Logger
@@ -51,6 +53,8 @@ namespace Musai
         {
             Result resultA = GetResult(logWrapperA.TwoCardHash);
             Result resultB = GetResult(logWrapperB.TwoCardHash);
+            resultA.TotalCount += 1;
+            resultB.TotalCount += 1;
             Judger.Result result;
             if(logWrapperA.ResultOfTwoCard != null && logWrapperB.ResultOfTwoCard != null)
             {
@@ -115,15 +119,26 @@ namespace Musai
 
         public static void Save()
         {
-            string content = string.Empty;
+            string content = @"类型1:手牌两个王
+类型2:手牌一个王
+类型3:两张牌同花，并且相差一个点，比如梅花1和梅花2 方块1和方块K
+类型4:两张牌同花，并且相差两个点，比如梅花1和梅花3 方块1和方块Q
+类型5:两张牌相差一个点，不同花，比如方块1和梅花2
+类型6:两张牌相差两个点，不同花，比如方块2和梅花K
+类型7:两张牌同花，不存在顺子可能，比如方块2和方块5
+类型8:两张牌同点，比如方块2和梅花2
+类型9:除上面之外的所有情况
+
+";
+
             List<string> keyList = _resultDict.Keys.ToList<string>();
-            keyList.Sort();
+            keyList.Sort(KeySort);
             for(int i = 0; i < keyList.Count; i++)
             {
                 string key = keyList[i];
                 Result result = _resultDict[key];
-                content += string.Format("{0, 30}", key) + "\t统计次数:" + 
-                    string.Format("{0, 6}", result.TwoCard.TotalCount) +
+                content += string.Format("{0, -15}", key) + "\t统计次数:" + 
+                    string.Format("{0, -6}", result.TotalCount) +
                     "\t两牌不败:" + FormatRate(result.TwoCard.GetUnloseRate()) + 
                     "\t两牌收益率:" + FormatRate(result.TwoCard.GetMoney()) + 
                     "\t补牌不败:" + FormatRate(result.ThreeCard.GetUnloseRate()) + 
@@ -132,9 +147,30 @@ namespace Musai
             FileTool.Write("Statistics.dat", content);
         }
 
+        private static int KeySort(string x, string y)
+        {
+            if(x == "双王")
+            {
+                return -1;
+            }
+            if(x == "单王" && y != "双王")
+            {
+                return -1;
+            }
+            if(y == "双王")
+            {
+                return 1;
+            }
+            if(y == "单王" && x != "双王")
+            {
+                return 1;
+            }
+            return x.CompareTo(y);
+        }
+
         private static string FormatRate(float rate)
         {
-            return String.Format("{0, 8}", rate.ToString("f2"));
+            return String.Format("{0, -8}", rate.ToString("f2"));
         }
 
         private static Result GetResult(string hash)

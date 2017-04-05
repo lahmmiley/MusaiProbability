@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using Tool;
 
@@ -49,10 +50,11 @@ namespace Musai
             _cardIndex = 0;
             int i = CARD_NUM;
             int j;
+            Random random = new Random(GetRandomSeed());
             while(i > 0)
             {
                 i--;
-                j = new Random(GetRandomSeed()).Next() % CARD_NUM;
+                j = random.Next() % CARD_NUM;
                 Card temp = _cardArray[i];
                 _cardArray[i] = _cardArray[j];
                 _cardArray[j] = temp;
@@ -64,22 +66,23 @@ namespace Musai
             return _cardArray[_cardIndex++];
         }
 
-        private byte[] _seedBytes = new byte[4];
+        //private byte[] _seedBytes = new byte[4];
         private int GetRandomSeed()
         {
             RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();
-            rng.GetBytes(_seedBytes);
-            return BitConverter.ToInt32(_seedBytes, 0);
+            byte[] seedBytes = new byte[4];
+            rng.GetBytes(seedBytes);
+            return BitConverter.ToInt32(seedBytes, 0);
         }
 
         //随机性测试
-        public void TestRandom()
+        public void TestRandom(Stopwatch spForSeed)
         {
             Dictionary<string, int> _dict = new Dictionary<string, int>();
-            for(int i = 0; i < 10000; i++)
+            for(int i = 0; i < 1; i++)
             {
                 Shuffle();
-                for(int j = 0; j < 6; j++)
+                for(int j = 0; j < 1; j++)
                 {
                     Card card = GetCard();
                     string hash = card.ToString();
@@ -91,10 +94,21 @@ namespace Musai
                 }
             }
             string content = string.Empty;
+            int max = int.MinValue;
+            int min = int.MaxValue;
             foreach(var key in _dict.Keys)
             {
                 content += string.Format("key:{0} count:{1}\n", key.ToCard(), _dict[key]);
+                if(_dict[key] > max)
+                {
+                    max = _dict[key];
+                }
+                if(_dict[key] < min)
+                {
+                    min = _dict[key];
+                }
             }
+            Console.WriteLine("max:" + max + "min:" + min + "\n");
             FileTool.Write("随机性测试数据.dat", content);
         }
 

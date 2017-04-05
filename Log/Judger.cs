@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,21 +16,27 @@ namespace Musai
             draw,
         }
 
+        public static Stopwatch sp = new Stopwatch();
+
         public static Result Judge(HandCardResult a, HandCardResult b)
         {
+            sp.Start();
             //个位数为零 胜 双王
             if((a.Level == CardLevel.onesDigitIsZero) && (b.Level == CardLevel.twoJoker))
             {
+                sp.Stop();
                 return Result.win;
             }
             if(a.Level < b.Level) 
             {
                 if (a.Level <= CardLevel.straight)
                 {
+                    sp.Stop();
                     return Result.win;
                 }
                 else
                 {
+                    sp.Stop();
                     return JudgeByOnesDigit(a, b);
                 }
             }
@@ -37,10 +44,12 @@ namespace Musai
             {
                 if(a.Level <= CardLevel.straight)
                 {
+                    sp.Stop();
                     return Result.draw;
                 }
                 else
                 {
+                    sp.Stop();
                     return JudgeByOnesDigit(a, b);
                 }
             }
@@ -49,10 +58,12 @@ namespace Musai
             {
                 if(b.Level > CardLevel.straight)
                 {
+                    sp.Stop();
                     return JudgeByOnesDigit(a, b);
                 }
             }
 
+            sp.Stop();
             return Result.lose;
         }
 

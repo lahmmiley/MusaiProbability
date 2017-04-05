@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Musai
 {
@@ -7,20 +8,36 @@ namespace Musai
     {
         static void Main(string[] args)
         {
+            Stopwatch sp = new Stopwatch();
+            sp.Start();
             Poker poker = Poker.Singleton;
-            for(int i = 0; i < 10000; i++)
+            Stopwatch spForShuffle = new Stopwatch();
+            Stopwatch spForLog = new Stopwatch();
+            //TODO 目标一千万
+            for (int i = 0; i < 1000000; i++)
             {
+                spForShuffle.Start();
                 poker.Shuffle();
-                //避免频繁洗牌
-                for(int j = 0; j < 5; j++)
+                spForShuffle.Stop();
+                for (int j = 0; j < 4; j++)
                 {
+                    spForLog.Start();
                     Logger.Log(GetLogWrapper(poker), GetLogWrapper(poker));
+                    spForLog.Stop();
                 }
             }
 
             Logger.Save();
+            sp.Stop();
+            //Console.WriteLine("洗牌耗时:" + spForShuffle.ElapsedMilliseconds);
+            Console.WriteLine("获取牌形结果耗时:" + CardLevelJudgement.sp.ElapsedMilliseconds);
+            //Console.WriteLine("判断耗时:" + Judger.sp.ElapsedMilliseconds);
+            Console.WriteLine("顺子判断耗时:" + CardLevelJudgement.spForStraight.ElapsedMilliseconds);
+            Console.WriteLine("比较记录耗时:" + spForLog.ElapsedMilliseconds);
+            Console.WriteLine("游戏总耗时:" + sp.ElapsedMilliseconds);
+            Console.Read();
         }
-        
+
         private static LogWrapper GetLogWrapper(Poker poker)
         {
             List<Card> cardList = new List<Card>();
@@ -38,12 +55,16 @@ namespace Musai
             string hash = string.Empty;
             list.Sort(Card.Sort);
             LogKind logKind = LogKindJudgement.GetLogKind(list);
-            if(logKind ==LogKind.oneJoker || logKind == LogKind.twoJoker)
+            if(logKind == LogKind.twoJoker)
             {
-                return logKind.ToString();
+                return "双王";
+            }
+            if(logKind ==LogKind.oneJoker)
+            {
+                return "单王";
             }
             int onesDigit = CardListJudgement.CalculateOnesDigit(list);
-            return onesDigit + " " + logKind;
+            return string.Format("个数:{0} 牌型:{1}", onesDigit.ToString(), ((int)logKind).ToString());
         }
 
         //可以修改添加的卡牌，测试结果

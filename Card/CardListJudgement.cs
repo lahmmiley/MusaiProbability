@@ -103,6 +103,29 @@ namespace Musai
             return true;
         }
 
+        private static List<int> _pointList = new List<int>();
+        public static bool IsStraight(List<Card> list)
+        {
+            _pointList.Clear();
+            for(int i = 0; i < list.Count; i++)
+            {
+                Card card = list[i];
+                if(!card.IsJoker())
+                {
+                    _pointList.Add(list[i].Point);
+                }
+            }
+
+            if(CardListJudgement.HaveJoker(list))
+            {
+                return CardListJudgement.IsStraightWithOneJoker(_pointList);
+            }
+            else
+            {
+                return CardListJudgement.IsStraightWithoutJoker(_pointList);
+            }
+        }
+
         //多出两位方便测试首尾相连
         private static int[] _straightTestArray = new int[15];
         private static void ArraySetZero()
@@ -113,10 +136,8 @@ namespace Musai
             }
         }
 
-        public static bool IsStraightWithoutJoker(List<int> list)
+        private static void IndexSetIntoArray(List<int> list)
         {
-            ArraySetZero();
-
             for(int i = 0; i < list.Count; i++)
             {
                 int point = list[i];
@@ -126,6 +147,12 @@ namespace Musai
                     _straightTestArray[point - 1 + Poker.PER_KIND_NUM] = 1;
                 }
             }
+        }
+
+        private static bool IsStraightWithoutJoker(List<int> list)
+        {
+            ArraySetZero();
+            IndexSetIntoArray(list);
 
             int continuout = 0;
             for(int i = 0; i < _straightTestArray.Length; i++)
@@ -146,19 +173,11 @@ namespace Musai
             return false;
         }
 
-        public static bool IsStraightWithOneJoker(List<int> list)
+        
+        private static bool IsStraightWithOneJoker(List<int> list)
         {
             ArraySetZero();
-
-            for(int i = 0; i < list.Count; i++)
-            {
-                int point = list[i];
-                _straightTestArray[point - 1] = 1;
-                if(point == 1 || point == 2)
-                {
-                    _straightTestArray[point - 1 + Poker.PER_KIND_NUM] = 1;
-                }
-            }
+            IndexSetIntoArray(list);
 
             for(int i = 0; i < _straightTestArray.Length - 2; i++)
             {
