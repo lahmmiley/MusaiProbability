@@ -177,9 +177,9 @@ namespace Test
             return false;
         }
 
-        private bool TestResult(List<Card> cardList, CardLevel level, int odds, int onesDigit = HandCardResult.INVALID_VALUE)
+        private bool TestResult(HandCard handCard, CardLevel level, int odds, int onesDigit = HandCardResult.INVALID_VALUE)
         {
-            HandCardResult result = CardLevelJudgement.GetHandCardResult(cardList);
+            HandCardResult result = CardLevelJudgement.GetHandCardResult(handCard);
             if((result.Level == level) && 
                 (result.Odds == odds))
             {
@@ -188,10 +188,6 @@ namespace Test
                     return true;
                 }
             }
-            for(int i = 0; i < cardList.Count; i++)
-            {
-                Console.WriteLine(cardList[i]);
-            }
             Console.WriteLine("计算结果 level:{0} odd:{1} onesDigit:{2}  正确结果 level:{3} odd:{4} onesDigit:{5}",
                 result.Level, result.Odds, result.OnesDigit, level, odds, onesDigit);
             return false;
@@ -199,19 +195,12 @@ namespace Test
 
         private bool TestResult(Card cardA, Card cardB, CardLevel level, int odds, int onesDigit = HandCardResult.INVALID_VALUE)
         {
-            List<Card> cardList = new List<Card>();
-            cardList.Add(cardA);
-            cardList.Add(cardB);
-            return TestResult(cardList, level, odds, onesDigit);
+            return TestResult(new HandCard(cardA, cardB), level, odds, onesDigit);
         }
 
         private bool TestResult(Card cardA, Card cardB, Card cardC, CardLevel level, int odds, int onesDigit = HandCardResult.INVALID_VALUE)
         {
-            List<Card> cardList = new List<Card>();
-            cardList.Add(cardA);
-            cardList.Add(cardB);
-            cardList.Add(cardC);
-            return TestResult(cardList, level, odds, onesDigit);
+            return TestResult(new HandCard(cardA, cardB, cardC), level, odds, onesDigit);
         }
 
         public bool TestJudger()

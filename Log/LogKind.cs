@@ -21,9 +21,9 @@ namespace Musai
         private class JudgeFunction
         {
             public LogKind Kind;
-            public Func<List<Card>, bool> Fun;
+            public Func<HandCard, bool> Fun;
 
-            public JudgeFunction(LogKind kind, Func<List<Card>, bool> fun)
+            public JudgeFunction(LogKind kind, Func<HandCard, bool> fun)
             {
                 this.Kind = kind;
                 this.Fun = fun;
@@ -45,13 +45,13 @@ namespace Musai
             _judgeFunciontList.Add(new JudgeFunction(LogKind.other, IsOther));
         }
 
-        public static LogKind GetLogKind(List<Card> list)
+        public static LogKind GetLogKind(HandCard handCard)
         {
             LogKind result = LogKind.other;
             for(int i = 0; i < _judgeFunciontList.Count; i++)
             {
                 JudgeFunction judgeFunction = _judgeFunciontList[i];
-                if(judgeFunction.Fun.Invoke(list))
+                if(judgeFunction.Fun.Invoke(handCard))
                 {
                     result = judgeFunction.Kind;
                     break;
@@ -60,80 +60,49 @@ namespace Musai
             return result;
         }
 
-        private static bool IsTwoJoker(List<Card> list)
+        private static bool IsTwoJoker(HandCard handCard)
         {
-            return CardListJudgement.IsTwoJoker(list);
+            return handCard.IsTwoJoker;
         }
 
-        private static bool IsOneJoker(List<Card> list)
+        private static bool IsOneJoker(HandCard handCard)
         {
-            return CardListJudgement.GetJokerCount(list) == 1;
+            return handCard.JokerCount == 1;
         }
 
-        private static bool IsStraightPossible1AndSameKind(List<Card> list)
+        private static bool IsStraightPossible1AndSameKind(HandCard handCard)
         {
-            return CardListJudgement.IsSameKind(list) && _IsStraightPossible1(list);
+            return handCard.IsSameKind && handCard.IsStraightPossible1;
         }
 
-        private static bool IsStraightPossible2AndSameKind(List<Card> list)
+        private static bool IsStraightPossible2AndSameKind(HandCard handCard)
         {
-            return CardListJudgement.IsSameKind(list) && _IsStraightPossible2(list);
+            return handCard.IsSameKind && handCard.IsStraightPossible2;
         }
 
-        private static bool IsStraightPossible1(List<Card> list)
+        private static bool IsStraightPossible1(HandCard handCard)
         {
-            return _IsStraightPossible1(list);
+            return handCard.IsStraightPossible1;
         }
 
-        private static bool IsStraightPossible2(List<Card> list)
+        private static bool IsStraightPossible2(HandCard handCard)
         {
-            return _IsStraightPossible2(list);
+            return handCard.IsStraightPossible2;
         }
 
-        private static bool IsSamePoint(List<Card> list)
+        private static bool IsSamePoint(HandCard handCard)
         {
-            return CardListJudgement.IsSamePoint(list);
+            return handCard.IsSamePoint;
         }
 
-        private static bool IsSameKind(List<Card> list)
+        private static bool IsSameKind(HandCard handCard)
         {
-            return CardListJudgement.IsSameKind(list);
+            return handCard.IsSameKind;
         }
 
-        private static bool IsOther(List<Card> list)
+        private static bool IsOther(HandCard handCard)
         {
             return true;
-        }
-
-        private static bool _IsStraightPossible1(List<Card> list)
-        {
-            Card a = list[0];
-            Card b = list[1];
-            if(Math.Abs(a.Point - b.Point) == 1)
-            {
-                return true;
-            }
-            if(a.Point == 1 && b.Point == 13)
-            {
-                return true;
-            }
-            return false;
-        }
-
-        private static bool _IsStraightPossible2(List<Card> list)
-        {
-            Card a = list[0];
-            Card b = list[1];
-            if(Math.Abs(a.Point - b.Point) == 2)
-            {
-                return true;
-            }
-            if((a.Point == 1 && b.Point == 12)
-                || (a.Point == 2 && b.Point == 13))
-            {
-                return true;
-            }
-            return false;
         }
     }
 }

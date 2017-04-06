@@ -15,35 +15,16 @@ namespace Musai
         public class JudgeFunction
         {
             public CardLevel Level;
-            public Func<JudgeParamWrapper, bool> Fun;
+            public Func<HandCard, bool> Fun;
             public int CardNumLimit;
             public int Odds;//赔率
 
-            public JudgeFunction(CardLevel level, Func<JudgeParamWrapper, bool> fun, int cardNumLimit, int odds)
+            public JudgeFunction(CardLevel level, Func<HandCard, bool> fun, int cardNumLimit, int odds)
             {
                 this.Level = level;
                 this.Fun = fun;
                 this.CardNumLimit = cardNumLimit;
                 this.Odds = odds;//初始赔率为0代表 需要重新计算
-            }
-        }
-
-        public class JudgeParamWrapper
-        {
-            public List<Card> CardList = new List<Card>();
-            public bool IsTwoJoker = false;
-            public int JokerCount = 0;
-            public int OnesDigit = 0;
-            public bool IsStraight = false;
-            public bool IsSameKind = false;
-            public bool IsSamePoint = false;
-            public bool IsInvalid = false;
-
-            public JudgeParamWrapper(List<Card> cardList)
-            {
-                this.CardList = cardList;
-                CardListJudgement.SetAllProperty(cardList, ref IsInvalid, ref IsTwoJoker, ref JokerCount, 
-                    ref OnesDigit, ref IsSamePoint, ref IsSameKind, ref IsStraight);
             }
         }
 
@@ -65,117 +46,114 @@ namespace Musai
             _judgeList.Add(new JudgeFunction(CardLevel.other, IsNormal, 0, 0));
         }
 
-        public static HandCardResult GetHandCardResult(List<Card> list)
+        public static HandCardResult GetHandCardResult(HandCard handCard)
         {
-            sp.Start();
             HandCardResult result = new HandCardResult();
-            JudgeParamWrapper paramWrapper = new JudgeParamWrapper(list);
             for(int i = 0; i < _judgeList.Count; i++)
             {
                 JudgeFunction judgeFunction = _judgeList[i];
                 int cardNumLimit = judgeFunction.CardNumLimit;
-                if((cardNumLimit != 0) && (cardNumLimit != list.Count))
+                if((cardNumLimit != 0) && (cardNumLimit != handCard.Count))
                 {
                     continue;
                 }
-                if(judgeFunction.Fun.Invoke(paramWrapper))
+                if(judgeFunction.Fun.Invoke(handCard))
                 {
                     result.Level = judgeFunction.Level;
                     result.Odds = judgeFunction.Odds;
                     if(judgeFunction.Odds == 0)
                     {
-                        result.Odds = CaculateOdds(judgeFunction.Level, paramWrapper);
+                        result.Odds = CaculateOdds(judgeFunction.Level, handCard);
                     }
                     break;
                 }
             }
 
             // list.Count == 2是因为获取hash时需要OnesDigit
-            if((list.Count == 2) || (result.Level >= CardLevel.onesDigitIsZero))
+            if((handCard.Count == 2) || (result.Level >= CardLevel.onesDigitIsZero))
             {
-                result.OnesDigit = paramWrapper.OnesDigit;
+                result.OnesDigit = handCard.OnesDigit;
             }
-            sp.Stop();
             return result;
         }
 
-        private static int CaculateOdds(CardLevel level, JudgeParamWrapper paramWrapper)
+        private static int CaculateOdds(CardLevel level, HandCard handCard)
         {
             int result = 1;
             if(level == CardLevel.onesDigitIsZero)
             {
                 result = 10;
             }
-            if(paramWrapper.IsSamePoint)
+            if(handCard.IsSamePoint)
             {
                 result = result * 2;
             }
-            else if(paramWrapper.IsSameKind)
+            else if(handCard.IsSameKind)
             {
-                result = result * paramWrapper.CardList.Count;
+                result = result * handCard.Count;
             }
 
             return result;
         }
 
-        private static bool IsInvalid(JudgeParamWrapper wrapper)
+        private static bool IsInvalid(HandCard handCard)
         {
-            return wrapper.IsInvalid;
+            return handCard.IsInvalid;
         }
 
-        private static bool IsTwoJoker(JudgeParamWrapper wrapper)
+        private static bool IsTwoJoker(HandCard handCard)
         {
-            return wrapper.IsTwoJoker;
+            return handCard.IsTwoJoker;
         }
 
-        private static bool IsTianGongNine(JudgeParamWrapper wrapper)
+        private static bool IsTianGongNine(HandCard handCard)
         {
-            if(wrapper.JokerCount != 0)
+            if(handCard.JokerCount != 0)
             {
                 return false;
             }
-            return wrapper.OnesDigit == 9;
+            return handCard.OnesDigit == 9;
         }
 
-        private static bool IsTianGongEight(JudgeParamWrapper wrapper)
+        private static bool IsTianGongEight(HandCard handCard)
         {
-            if(wrapper.JokerCount != 0)
+            if(handCard.JokerCount != 0)
             {
                 return false;
             }
-            return wrapper.OnesDigit == 8;
+            return handCard.OnesDigit == 8;
         }
 
-        private static bool IsThreeCardWithTwoJoker(JudgeParamWrapper wrapper)
+        private static bool IsThreeCardWithTwoJoker(HandCard handCard)
         {
-            return wrapper.JokerCount == 2;
+            return handCard.JokerCount == 2;
         }
 
-        private static bool IsStraightFlush(JudgeParamWrapper wrapper)
+        private static bool IsStraightFlush(HandCard handCard)
         {
-            return wrapper.IsSameKind && wrapper.IsStraight;
+            return handCard.IsSameKind && handCard.IsStraight;
         }
 
-        private static bool IsThreeCardWithSamePoint(JudgeParamWrapper wrapper)
+        private static bool IsThreeCardWithSamePoint(HandCard handCard)
         {
-            return wrapper.IsSamePoint;
+            return handCard.IsSamePoint;
         }
 
-        private static bool IsStraight(JudgeParamWrapper wrapper)
+        private static bool IsStraight(HandCard handCard)
         {
-            return wrapper.IsStraight;
+            return handCard.IsStraight;
         }
 
-        private static bool IsOnesDigitIsZero(JudgeParamWrapper wrapper)
+        private static bool IsOnesDigitIsZero(HandCard handCard)
         {
-            if(wrapper.JokerCount != 0)
+            if(handCard.JokerCount != 0)
             {
                 return false;
             }
-            return wrapper.OnesDigit == 0;
+            return handCard.OnesDigit == 0;
         }
 
-        private static bool IsNormal(JudgeParamWrapper wrappert)
+        private static bool IsNormal(HandCard handCardt)
         {
             return true;
         }

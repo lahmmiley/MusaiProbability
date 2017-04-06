@@ -61,7 +61,8 @@
     <Compile Include="Card\Card.cs" />
     <Compile Include="Card\CardLevel.cs" />
     <Compile Include="Card\CardLevelJudgement.cs" />
-    <Compile Include="Card\CardListJudgement.cs" />
+    <Compile Include="Card\HandCard.cs" />
+    <Compile Include="Card\HandCardPool.cs" />
     <Compile Include="Card\HandCardResult.cs" />
     <Compile Include="Log\LogKind.cs" />
     <Compile Include="Log\LogWrapper.cs" />

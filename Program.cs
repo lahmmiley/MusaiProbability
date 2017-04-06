@@ -20,7 +20,7 @@ namespace Musai
             sp.Start();
             Poker poker = Poker.Singleton;
             //一千万耗时5分钟以上
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < 10000000; i++)
             {
                 spForShuffle.Start();
                 poker.Shuffle();
@@ -53,32 +53,15 @@ namespace Musai
 
         private static LogWrapper GetLogWrapper(Poker poker)
         {
-            List<Card> cardList = new List<Card>(3);
-            cardList.Add(poker.GetCard());
-            cardList.Add(poker.GetCard());
-            HandCardResult resultOfTwoCard = CardLevelJudgement.GetHandCardResult(cardList);
-            string hash = GetHash(cardList, resultOfTwoCard.OnesDigit);
-            cardList.Add(poker.GetCard());
-            HandCardResult resultOfThreeCard = CardLevelJudgement.GetHandCardResult(cardList);
-            return new LogWrapper(hash, resultOfTwoCard, resultOfThreeCard);
-        }
-
-        private static string GetHash(List<Card> list, int onesDigit)
-        {
-            string hash = string.Empty;
-            list.Sort(Card.Sort);
-            _sp1.Start();
-            LogKind logKind = LogKindJudgement.GetLogKind(list);
-            _sp1.Stop();
-            if(logKind == LogKind.twoJoker)
-            {
-                return "双王";
-            }
-            if(logKind ==LogKind.oneJoker)
-            {
-                return "单王";
-            }
-            return string.Format("个位:{0} 牌型:{1}", onesDigit.ToString(), ((int)logKind).ToString());
+            Card a, b, c;
+            a = poker.GetCard();
+            b = poker.GetCard();
+            c = poker.GetCard();
+            HandCard twoCard = HandCardPool.Get(a, b);
+            HandCard threeeCard = HandCardPool.Get(a, b, c);
+            HandCardResult resultOfTwoCard = CardLevelJudgement.GetHandCardResult(twoCard);
+            HandCardResult resultOfThreeCard = CardLevelJudgement.GetHandCardResult(threeeCard);
+            return new LogWrapper(twoCard.Hash, resultOfTwoCard, resultOfThreeCard);
         }
     }
 }
