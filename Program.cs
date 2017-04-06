@@ -7,21 +7,17 @@ namespace Musai
 {
     class Program
     {
+        private Stopwatch _sp = new Stopwatch();
         static void Main(string[] args)
         {
-            TestUnit testUnit = TestUnit.Singleton;
-            if(!testUnit.TestRandom())
-            {
-                Console.Read();
-                return;
-            }
-
+            TestUnit.Singleton.Test();
 
             Stopwatch sp = new Stopwatch();
+            Stopwatch spForShuffle = new Stopwatch();
+            Stopwatch spForGetWrapper = new Stopwatch();
+            Stopwatch spForLog = new Stopwatch();
             sp.Start();
             Poker poker = Poker.Singleton;
-            Stopwatch spForShuffle = new Stopwatch();
-            Stopwatch spForLog = new Stopwatch();
             //TODO 目标一千万
             for (int i = 0; i < 10000; i++)
             {
@@ -30,19 +26,29 @@ namespace Musai
                 spForShuffle.Stop();
                 for (int j = 0; j < 4; j++)
                 {
+                    spForGetWrapper.Start();
+                    LogWrapper a = GetLogWrapper(poker);
+                    LogWrapper b = GetLogWrapper(poker);
+                    spForGetWrapper.Stop();
                     spForLog.Start();
-                    Logger.Log(GetLogWrapper(poker), GetLogWrapper(poker));
+                    Logger.Log(a, b);
                     spForLog.Stop();
                 }
             }
 
             Logger.Save();
-            sp.Stop();
             //Console.WriteLine("洗牌耗时:" + spForShuffle.ElapsedMilliseconds);
+            //Console.WriteLine("获取Wrapper耗时:" + spForGetWrapper.ElapsedMilliseconds);
             Console.WriteLine("获取牌形结果耗时:" + CardLevelJudgement.sp.ElapsedMilliseconds);
             //Console.WriteLine("判断耗时:" + Judger.sp.ElapsedMilliseconds);
             Console.WriteLine("顺子判断耗时:" + CardLevelJudgement.spForStraight.ElapsedMilliseconds);
-            Console.WriteLine("比较记录耗时:" + spForLog.ElapsedMilliseconds);
+            Console.WriteLine("个位判断耗时:" + CardLevelJudgement.spForOnesDigit.ElapsedMilliseconds);
+            Console.WriteLine("双王判断耗时:" + CardLevelJudgement.spForTwoJoker.ElapsedMilliseconds);
+            Console.WriteLine("同花色判断耗时:" + CardLevelJudgement.spForSameKind.ElapsedMilliseconds);
+            Console.WriteLine("同点数判断耗时:" + CardLevelJudgement.spForSamePoint.ElapsedMilliseconds);
+            Console.WriteLine("计算赔率耗时:" + CardLevelJudgement.spForOdds.ElapsedMilliseconds);
+            //Console.WriteLine("比较记录耗时:" + spForLog.ElapsedMilliseconds);
+            Console.WriteLine("计算个位耗时:" + CardLevelJudgement.spForCalOnesDigit.ElapsedMilliseconds);
             Console.WriteLine("游戏总耗时:" + sp.ElapsedMilliseconds);
             Console.Read();
         }

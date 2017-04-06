@@ -30,29 +30,58 @@ namespace Musai
 
         public class JudgeParamWrapper
         {
-            private const int INVALID_VALUE = int.MinValue;
             public List<Card> CardList = new List<Card>();
-            private int _onesDigit = INVALID_VALUE;
+            private bool _twoJokerJudged = false;
+            private bool _isTwoJoker = false;
+            private bool _onesDigitJudged = false;
+            private int _onesDigit = 0;
             private bool _straightJudged = false;
             private bool _isStraight = false;
             private bool _sameKindJudged = false;
             private bool _isSameKind = false;
             private bool _samePointJudged = false;
             private bool _isSamePoint = false;
-            private int _jokerCount = INVALID_VALUE;
+            private bool _jokerCountJudged = false;
+            private int _jokerCount = 0;
 
             public JudgeParamWrapper(List<Card> cardList)
             {
                 this.CardList = cardList;
+                _twoJokerJudged = true;
+                _jokerCountJudged = true;
+                _onesDigitJudged = true;
+                _samePointJudged = true;
+                _sameKindJudged = true;
+                spForCalOnesDigit.Start();
+                CardListJudgement.CalculateBaseProperty(cardList, ref _isTwoJoker, ref _jokerCount, ref _onesDigit, ref _isSamePoint, ref _isSameKind);
+                spForCalOnesDigit.Stop();
+            }
+
+            public bool IsTwoJoker
+            {
+                get
+                {
+                    if(_twoJokerJudged == false)
+                    {
+                        _twoJokerJudged = true;
+                        //spForTwoJoker.Start();
+                        _isTwoJoker = CardListJudgement.IsTwoJoker(CardList);
+                        //spForTwoJoker.Stop();
+                    }
+                    return _isTwoJoker;
+                }
             }
 
             public int OnesDigit
             {
                 get
                 {
-                    if(_onesDigit == INVALID_VALUE)
+                    if(_onesDigitJudged == false)
                     {
+                        _onesDigitJudged = true;
+                        //spForOnesDigit.Start();
                         _onesDigit = CardListJudgement.CalculateOnesDigit(CardList);
+                        //spForOnesDigit.Stop();
                     }
                     return _onesDigit;
                 }
@@ -62,8 +91,9 @@ namespace Musai
             {
                 get
                 {
-                    if(_jokerCount == INVALID_VALUE)
+                    if(_jokerCountJudged == false)
                     {
+                        _jokerCountJudged = true;
                         _jokerCount = CardListJudgement.GetJokerCount(CardList);
                     }
                     return _jokerCount;
@@ -92,7 +122,9 @@ namespace Musai
                     if(_samePointJudged == false)
                     {
                         _samePointJudged = true;
+                        //spForSamePoint.Start();
                         _isSamePoint = CardListJudgement.IsSamePoint(CardList);
+                        //spForSamePoint.Stop();
                     }
                     return _isSamePoint;
                 }
@@ -105,7 +137,9 @@ namespace Musai
                     if(_sameKindJudged == false)
                     {
                         _sameKindJudged = true;
+                        //spForSameKind.Start();
                         _isSameKind = CardListJudgement.IsSameKind(CardList);
+                        //spForSameKind.Stop();
                     }
                     return _isSameKind;
                 }
@@ -114,6 +148,12 @@ namespace Musai
 
         public static Stopwatch sp = new Stopwatch();
         public static Stopwatch spForStraight = new Stopwatch();
+        public static Stopwatch spForOnesDigit = new Stopwatch();
+        public static Stopwatch spForTwoJoker = new Stopwatch();
+        public static Stopwatch spForSameKind = new Stopwatch();
+        public static Stopwatch spForSamePoint = new Stopwatch();
+        public static Stopwatch spForOdds = new Stopwatch();
+        public static Stopwatch spForCalOnesDigit = new Stopwatch();
         private static List<JudgeFunction> _judgeList = new List<JudgeFunction>();
 
         static CardLevelJudgement()
@@ -160,7 +200,9 @@ namespace Musai
             }
             if(result.Level >= CardLevel.onesDigitIsZero)
             {
-                result.OnesDigit = CardListJudgement.CalculateOnesDigit(list);
+                //spForCalOnesDigit.Start();
+                result.OnesDigit = paramWrapper.OnesDigit;
+                //spForCalOnesDigit.Stop();
             }
             sp.Stop();
             return result;
@@ -168,6 +210,7 @@ namespace Musai
 
         private static int CaculateOdds(CardLevel level, JudgeParamWrapper paramWrapper)
         {
+            //spForOdds.Start();
             int result = 1;
             if(level == CardLevel.onesDigitIsZero)
             {
@@ -182,12 +225,13 @@ namespace Musai
                 result = result * paramWrapper.CardList.Count;
             }
 
+            //spForOdds.Stop();
             return result;
         }
 
         private static bool IsTwoJoker(JudgeParamWrapper wrapper)
         {
-            return CardListJudgement.IsTwoJoker(wrapper.CardList);
+            return wrapper.IsTwoJoker;
         }
 
         private static bool IsTianGongNine(JudgeParamWrapper wrapper)

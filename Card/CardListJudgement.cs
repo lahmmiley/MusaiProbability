@@ -11,6 +11,56 @@ namespace Musai
     /// </summary>
     public class CardListJudgement
     {
+        //性能优化，先计算常用的属性，避免多次遍历
+        public static void CalculateBaseProperty(List<Card> list, ref bool isTwoJoker, ref int jokerCount, 
+            ref int onesDigit, ref bool isSamePoint, ref bool isSameKind)
+        {
+            int sum = 0;
+            isSamePoint = true;
+            int point = int.MinValue;
+            isSameKind = true;
+            Card.Kind kind = Card.Kind.invalid;
+
+            for(int i = 0; i < list.Count; i++)
+            {
+                Card card = list[i];
+                if (card.IsJoker())
+                {
+                    jokerCount += 1;
+                }
+                else
+                {
+                    sum += card.CounterPoint;
+                    if(isSamePoint)
+                    {
+                        if(point == int.MinValue)
+                        {
+                            point = card.Point;
+                        }
+                        else if(point != card.Point)
+                        {
+                            isSamePoint = false;
+                        }
+                    }
+                    if(isSameKind)
+                    {
+                        if (kind == Card.Kind.invalid)
+                        {
+                            kind = card.CardKind;
+                        }
+                        else if (kind != card.CardKind)
+                        {
+                            isSameKind = false;
+                        }
+                    }
+                }
+            }
+
+            isTwoJoker = (jokerCount == 2) && (list.Count == 2);
+            onesDigit = (jokerCount > 0) ? 9 : sum % 10;
+            
+        }
+
         public static bool IsTwoJoker(List<Card> list)
         {
             return  list.Count == 2 && GetJokerCount(list) == 2;
