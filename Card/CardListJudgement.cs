@@ -11,11 +11,10 @@ namespace Musai
     /// </summary>
     public class CardListJudgement
     {
-        //性能优化，先计算常用的属性，避免多次遍历
-        public static void CalculateBaseProperty(List<Card> list, ref bool isTwoJoker, ref int jokerCount, 
+        //性能优化，避免多次遍历
+        private static List<int> _pointList = new List<int>();
+        public static void SetAllProperty(List<Card> list, ref bool isInvalid, ref bool isTwoJoker, ref int jokerCount, 
             ref int onesDigit, ref bool isSamePoint, ref bool isSameKind, ref bool isStraight)
-        //public static void CalculateBaseProperty(List<Card> list, ref int jokerCount, 
-        //    ref int onesDigit, ref bool isSamePoint, ref bool isSameKind)
         {
             int sum = 0;
             isSamePoint = true;
@@ -35,43 +34,60 @@ namespace Musai
                 {
                     sum += card.CounterPoint;
                     _pointList.Add(list[i].Point);
-                    if(isSamePoint)
-                    {
-                        if(point == int.MinValue)
-                        {
-                            point = card.Point;
-                        }
-                        else if(point != card.Point)
-                        {
-                            isSamePoint = false;
-                        }
-                    }
-                    if(isSameKind)
-                    {
-                        if (kind == Card.Kind.invalid)
-                        {
-                            kind = card.CardKind;
-                        }
-                        else if (kind != card.CardKind)
-                        {
-                            isSameKind = false;
-                        }
-                    }
+                    JudgeSamePoint(card, ref point, ref isSamePoint);
+                    JudgeSameKind(card, ref kind, ref isSameKind);
                 }
             }
 
+            isInvalid = (jokerCount == 1) && (list.Count == 2);
             isTwoJoker = (jokerCount == 2) && (list.Count == 2);
             onesDigit = (jokerCount > 0) ? 9 : sum % 10;
+            JudgeStraight(jokerCount, _pointList, ref isStraight);
 
+        }
+
+        private static void JudgeSamePoint(Card card, ref int point, ref bool isSamePoint)
+        {
+            if(isSamePoint)
+            {
+                if(point == int.MinValue)
+                {
+                    point = card.Point;
+                }
+                else if(point != card.Point)
+                {
+                    isSamePoint = false;
+                }
+            }
+        }
+
+        private static void JudgeSameKind(Card card, ref Card.Kind kind, ref bool isSameKind)
+        {
+            if(isSameKind)
+            {
+                if (kind == Card.Kind.invalid)
+                {
+                    kind = card.CardKind;
+                }
+                else if (kind != card.CardKind)
+                {
+                    isSameKind = false;
+                }
+            }
+        }
+
+        private static void JudgeStraight(int jokerCount, List<int> pointList, ref bool isStraight)
+        {
             if(jokerCount > 0)
             {
-                isStraight = CardListJudgement.IsStraightWithOneJoker(_pointList);
+                isStraight = CardListJudgement.IsStraightWithOneJoker(pointList);
             }
             else
             {
-                isStraight = CardListJudgement.IsStraightWithoutJoker(_pointList);
+                isStraight = CardListJudgement.IsStraightWithoutJoker(pointList);
             }
         }
+
 
         public static bool IsTwoJoker(List<Card> list)
         {
@@ -163,29 +179,6 @@ namespace Musai
                 }
             }
             return true;
-        }
-
-        private static List<int> _pointList = new List<int>();
-        public static bool IsStraight(List<Card> list)
-        {
-            _pointList.Clear();
-            for(int i = 0; i < list.Count; i++)
-            {
-                Card card = list[i];
-                if(!card.IsJoker())
-                {
-                    _pointList.Add(list[i].Point);
-                }
-            }
-
-            if(CardListJudgement.HaveJoker(list))
-            {
-                return CardListJudgement.IsStraightWithOneJoker(_pointList);
-            }
-            else
-            {
-                return CardListJudgement.IsStraightWithoutJoker(_pointList);
-            }
         }
 
         //多出两位方便测试首尾相连

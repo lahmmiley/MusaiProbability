@@ -101,10 +101,8 @@ namespace Test
             if(
                 TestResult(new Card(Card.Kind.redJoker), new Card(Card.Kind.blackJoker), 
                     CardLevel.twoJoker, 10) &&
-                //TODO
-                //TestResult(new Card(Card.Kind.redJoker, -1), new Card(Card.Kind.diamonds, 1), 
-                //    CardLevel.invalid, 10, 9) &&
-
+                TestResult(new Card(Card.Kind.redJoker), new Card(Card.Kind.diamonds, 1), 
+                    CardLevel.invalid, -1) &&
                 TestResult(new Card(Card.Kind.diamonds, 10), new Card(Card.Kind.hearts, 9), 
                       CardLevel.tianGongNine, 1) &&
                 TestResult(new Card(Card.Kind.diamonds, 10), new Card(Card.Kind.diamonds, 9), 
@@ -183,11 +181,19 @@ namespace Test
         {
             HandCardResult result = CardLevelJudgement.GetHandCardResult(cardList);
             if((result.Level == level) && 
-                (result.Odds == odds) && 
-                (result.OnesDigit == onesDigit))
+                (result.Odds == odds))
             {
-                return true;
+                if((onesDigit == HandCardResult.INVALID_VALUE) || (result.OnesDigit == onesDigit))
+                {
+                    return true;
+                }
             }
+            for(int i = 0; i < cardList.Count; i++)
+            {
+                Console.WriteLine(cardList[i]);
+            }
+            Console.WriteLine("计算结果 level:{0} odd:{1} onesDigit:{2}  正确结果 level:{3} odd:{4} onesDigit:{5}",
+                result.Level, result.Odds, result.OnesDigit, level, odds, onesDigit);
             return false;
         }
 

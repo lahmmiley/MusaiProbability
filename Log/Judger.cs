@@ -14,6 +14,7 @@ namespace Musai
             win,
             lose,
             draw,
+            invalid,
         }
 
         public static Stopwatch sp = new Stopwatch();
@@ -21,6 +22,10 @@ namespace Musai
         public static Result Judge(HandCardResult a, HandCardResult b)
         {
             sp.Start();
+            if((a.Level == CardLevel.invalid) || (b.Level == CardLevel.invalid))
+            {
+                return Result.invalid;
+            }
             //个位数为零 胜 双王
             if((a.Level == CardLevel.onesDigitIsZero) && (b.Level == CardLevel.twoJoker))
             {

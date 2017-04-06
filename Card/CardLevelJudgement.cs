@@ -31,167 +31,29 @@ namespace Musai
         public class JudgeParamWrapper
         {
             public List<Card> CardList = new List<Card>();
-            private bool _twoJokerJudged = false;
-            private bool _isTwoJoker = false;
-            private bool _onesDigitJudged = false;
-            private int _onesDigit = 0;
-            private bool _straightJudged = false;
-            private bool _isStraight = false;
-            private bool _sameKindJudged = false;
-            private bool _isSameKind = false;
-            private bool _samePointJudged = false;
-            private bool _isSamePoint = false;
-            private bool _jokerCountJudged = false;
-            private int _jokerCount = 0;
+            public bool IsTwoJoker = false;
+            public int JokerCount = 0;
+            public int OnesDigit = 0;
+            public bool IsStraight = false;
+            public bool IsSameKind = false;
+            public bool IsSamePoint = false;
+            public bool IsInvalid = false;
 
             public JudgeParamWrapper(List<Card> cardList)
             {
                 this.CardList = cardList;
-                _twoJokerJudged = true;
-                _straightJudged = true;
-                _jokerCountJudged = true;
-                _onesDigitJudged = true;
-                _samePointJudged = true;
-                _sameKindJudged = true;
-                spForCalOnesDigit.Start();
-                //CardListJudgement.CalculateBaseProperty(cardList, ref _jokerCount, ref _onesDigit, ref _isSamePoint, ref _isSameKind);
-                //最佳的方案就是一开始所有属性都计算好...
-                CardListJudgement.CalculateBaseProperty(cardList, ref _isTwoJoker, ref _jokerCount, ref _onesDigit, ref _isSamePoint, ref _isSameKind, ref _isStraight);
-                spForCalOnesDigit.Stop();
-            }
-
-            public bool IsTwoJoker
-            {
-                get
-                {
-                    if(_twoJokerJudged == false)
-                    {
-                        _twoJokerJudged = true;
-                        if (!countDict.ContainsKey(1))
-                        {
-                            countDict.Add(1, 0);
-                        }
-                        countDict[1] += 1;
-                        //spForTwoJoker.Start();
-                        _isTwoJoker = CardListJudgement.IsTwoJoker(CardList);
-                        //spForTwoJoker.Stop();
-                    }
-                    return _isTwoJoker;
-                }
-            }
-
-            public int OnesDigit
-            {
-                get
-                {
-                    if(_onesDigitJudged == false)
-                    {
-                        _onesDigitJudged = true;
-                        if (!countDict.ContainsKey(2))
-                        {
-                            countDict.Add(2, 0);
-                        }
-                        countDict[2] += 1;
-                        //spForOnesDigit.Start();
-                        _onesDigit = CardListJudgement.CalculateOnesDigit(CardList);
-                        //spForOnesDigit.Stop();
-                    }
-                    return _onesDigit;
-                }
-            }
-
-            public int JokerCount
-            {
-                get
-                {
-                    if(_jokerCountJudged == false)
-                    {
-                        _jokerCountJudged = true;
-                        if (!countDict.ContainsKey(3))
-                        {
-                            countDict.Add(3, 0);
-                        }
-                        countDict[3] += 1;
-                        _jokerCount = CardListJudgement.GetJokerCount(CardList);
-                    }
-                    return _jokerCount;
-                }
-            }
-
-            public bool IsStraight
-            {
-                get
-                {
-                    if(_straightJudged == false)
-                    {
-                        if (!countDict.ContainsKey(4))
-                        {
-                            countDict.Add(4, 0);
-                        }
-                        countDict[4] += 1;
-                        _straightJudged = true;
-                        //spForStraight.Start();
-                        _isStraight = CardListJudgement.IsStraight(CardList);
-                        //spForStraight.Stop();
-                    }
-                    return _isStraight;
-                }
-            }
-
-            public bool IsSamePoint
-            {
-                get
-                {
-                    if(_samePointJudged == false)
-                    {
-                        if (!countDict.ContainsKey(5))
-                        {
-                            countDict.Add(5, 0);
-                        }
-                        countDict[5] += 1;
-                        _samePointJudged = true;
-                        //spForSamePoint.Start();
-                        _isSamePoint = CardListJudgement.IsSamePoint(CardList);
-                        //spForSamePoint.Stop();
-                    }
-                    return _isSamePoint;
-                }
-            }
-
-            public bool IsSameKind
-            {
-                get
-                {
-                    if(_sameKindJudged == false)
-                    {
-                        if (!countDict.ContainsKey(6))
-                        {
-                            countDict.Add(6, 0);
-                        }
-                        countDict[6] += 1;
-                        _sameKindJudged = true;
-                        //spForSameKind.Start();
-                        _isSameKind = CardListJudgement.IsSameKind(CardList);
-                        //spForSameKind.Stop();
-                    }
-                    return _isSameKind;
-                }
+                CardListJudgement.SetAllProperty(cardList, ref IsInvalid, ref IsTwoJoker, ref JokerCount, 
+                    ref OnesDigit, ref IsSamePoint, ref IsSameKind, ref IsStraight);
             }
         }
 
         public static Stopwatch sp = new Stopwatch();
-        public static Stopwatch spForStraight = new Stopwatch();
-        public static Stopwatch spForOnesDigit = new Stopwatch();
-        public static Stopwatch spForTwoJoker = new Stopwatch();
-        public static Stopwatch spForSameKind = new Stopwatch();
-        public static Stopwatch spForSamePoint = new Stopwatch();
         public static Stopwatch spForOdds = new Stopwatch();
-        public static Stopwatch spForCalOnesDigit = new Stopwatch();
-        public static Dictionary<int, int> countDict = new Dictionary<int, int>();
         private static List<JudgeFunction> _judgeList = new List<JudgeFunction>();
 
         static CardLevelJudgement()
         {
+            _judgeList.Add(new JudgeFunction(CardLevel.invalid, IsInvalid, 2, -1));
             _judgeList.Add(new JudgeFunction(CardLevel.twoJoker, IsTwoJoker, 2, 10));
             _judgeList.Add(new JudgeFunction(CardLevel.tianGongNine, IsTianGongNine, 2, 0));
             _judgeList.Add(new JudgeFunction(CardLevel.tianGongEight, IsTianGongEight, 2, 0));
@@ -206,11 +68,6 @@ namespace Musai
         public static HandCardResult GetHandCardResult(List<Card> list)
         {
             sp.Start();
-            if(IsTwoCard(list) && CardListJudgement.GetJokerCount(list) == 1)//两张牌如果有一张是大小王则无效
-            {
-                sp.Stop();
-                return null;
-            }
             HandCardResult result = new HandCardResult();
             JudgeParamWrapper paramWrapper = new JudgeParamWrapper(list);
             for(int i = 0; i < _judgeList.Count; i++)
@@ -232,11 +89,11 @@ namespace Musai
                     break;
                 }
             }
+
+            // list.Count == 2是因为获取hash时需要OnesDigit
             if((list.Count == 2) || (result.Level >= CardLevel.onesDigitIsZero))
             {
-                //spForCalOnesDigit.Start();
                 result.OnesDigit = paramWrapper.OnesDigit;
-                //spForCalOnesDigit.Stop();
             }
             sp.Stop();
             return result;
@@ -244,7 +101,6 @@ namespace Musai
 
         private static int CaculateOdds(CardLevel level, JudgeParamWrapper paramWrapper)
         {
-            //spForOdds.Start();
             int result = 1;
             if(level == CardLevel.onesDigitIsZero)
             {
@@ -259,8 +115,12 @@ namespace Musai
                 result = result * paramWrapper.CardList.Count;
             }
 
-            //spForOdds.Stop();
             return result;
+        }
+
+        private static bool IsInvalid(JudgeParamWrapper wrapper)
+        {
+            return wrapper.IsInvalid;
         }
 
         private static bool IsTwoJoker(JudgeParamWrapper wrapper)
@@ -318,11 +178,6 @@ namespace Musai
         private static bool IsNormal(JudgeParamWrapper wrappert)
         {
             return true;
-        }
-
-        private static bool IsTwoCard(List<Card> list)
-        {
-            return list.Count == 2;
         }
     }
 }
