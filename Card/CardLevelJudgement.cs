@@ -48,12 +48,15 @@ namespace Musai
             {
                 this.CardList = cardList;
                 _twoJokerJudged = true;
+                _straightJudged = true;
                 _jokerCountJudged = true;
                 _onesDigitJudged = true;
                 _samePointJudged = true;
                 _sameKindJudged = true;
                 spForCalOnesDigit.Start();
-                CardListJudgement.CalculateBaseProperty(cardList, ref _isTwoJoker, ref _jokerCount, ref _onesDigit, ref _isSamePoint, ref _isSameKind);
+                //CardListJudgement.CalculateBaseProperty(cardList, ref _jokerCount, ref _onesDigit, ref _isSamePoint, ref _isSameKind);
+                //最佳的方案就是一开始所有属性都计算好...
+                CardListJudgement.CalculateBaseProperty(cardList, ref _isTwoJoker, ref _jokerCount, ref _onesDigit, ref _isSamePoint, ref _isSameKind, ref _isStraight);
                 spForCalOnesDigit.Stop();
             }
 
@@ -64,6 +67,11 @@ namespace Musai
                     if(_twoJokerJudged == false)
                     {
                         _twoJokerJudged = true;
+                        if (!countDict.ContainsKey(1))
+                        {
+                            countDict.Add(1, 0);
+                        }
+                        countDict[1] += 1;
                         //spForTwoJoker.Start();
                         _isTwoJoker = CardListJudgement.IsTwoJoker(CardList);
                         //spForTwoJoker.Stop();
@@ -79,6 +87,11 @@ namespace Musai
                     if(_onesDigitJudged == false)
                     {
                         _onesDigitJudged = true;
+                        if (!countDict.ContainsKey(2))
+                        {
+                            countDict.Add(2, 0);
+                        }
+                        countDict[2] += 1;
                         //spForOnesDigit.Start();
                         _onesDigit = CardListJudgement.CalculateOnesDigit(CardList);
                         //spForOnesDigit.Stop();
@@ -94,6 +107,11 @@ namespace Musai
                     if(_jokerCountJudged == false)
                     {
                         _jokerCountJudged = true;
+                        if (!countDict.ContainsKey(3))
+                        {
+                            countDict.Add(3, 0);
+                        }
+                        countDict[3] += 1;
                         _jokerCount = CardListJudgement.GetJokerCount(CardList);
                     }
                     return _jokerCount;
@@ -106,10 +124,15 @@ namespace Musai
                 {
                     if(_straightJudged == false)
                     {
+                        if (!countDict.ContainsKey(4))
+                        {
+                            countDict.Add(4, 0);
+                        }
+                        countDict[4] += 1;
                         _straightJudged = true;
-                        spForStraight.Start();
+                        //spForStraight.Start();
                         _isStraight = CardListJudgement.IsStraight(CardList);
-                        spForStraight.Stop();
+                        //spForStraight.Stop();
                     }
                     return _isStraight;
                 }
@@ -121,6 +144,11 @@ namespace Musai
                 {
                     if(_samePointJudged == false)
                     {
+                        if (!countDict.ContainsKey(5))
+                        {
+                            countDict.Add(5, 0);
+                        }
+                        countDict[5] += 1;
                         _samePointJudged = true;
                         //spForSamePoint.Start();
                         _isSamePoint = CardListJudgement.IsSamePoint(CardList);
@@ -136,6 +164,11 @@ namespace Musai
                 {
                     if(_sameKindJudged == false)
                     {
+                        if (!countDict.ContainsKey(6))
+                        {
+                            countDict.Add(6, 0);
+                        }
+                        countDict[6] += 1;
                         _sameKindJudged = true;
                         //spForSameKind.Start();
                         _isSameKind = CardListJudgement.IsSameKind(CardList);
@@ -154,6 +187,7 @@ namespace Musai
         public static Stopwatch spForSamePoint = new Stopwatch();
         public static Stopwatch spForOdds = new Stopwatch();
         public static Stopwatch spForCalOnesDigit = new Stopwatch();
+        public static Dictionary<int, int> countDict = new Dictionary<int, int>();
         private static List<JudgeFunction> _judgeList = new List<JudgeFunction>();
 
         static CardLevelJudgement()
@@ -198,7 +232,7 @@ namespace Musai
                     break;
                 }
             }
-            if(result.Level >= CardLevel.onesDigitIsZero)
+            if((list.Count == 2) || (result.Level >= CardLevel.onesDigitIsZero))
             {
                 //spForCalOnesDigit.Start();
                 result.OnesDigit = paramWrapper.OnesDigit;
@@ -259,7 +293,7 @@ namespace Musai
 
         private static bool IsStraightFlush(JudgeParamWrapper wrapper)
         {
-            return wrapper.IsStraight && wrapper.IsSameKind;
+            return wrapper.IsSameKind && wrapper.IsStraight;
         }
 
         private static bool IsThreeCardWithSamePoint(JudgeParamWrapper wrapper)
