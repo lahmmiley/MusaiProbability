@@ -35,6 +35,13 @@ namespace Musai
             }
         }
 
+        public int GetHash()
+        {
+            //从10开始，保证一定是两位数 最大为Kind.invalid 为99
+            //Point从1开始，乘15比较安全
+            return 10 + ((int)CardKind) * 15 + Point;
+        }
+
         public override string ToString()
         {
             return ((int)CardKind).ToString() + "_" + Point.ToString();

@@ -28,8 +28,6 @@ namespace Musai
             }
         }
 
-        public static Stopwatch sp = new Stopwatch();
-        public static Stopwatch spForOdds = new Stopwatch();
         private static List<JudgeFunction> _judgeList = new List<JudgeFunction>();
 
         static CardLevelJudgement()

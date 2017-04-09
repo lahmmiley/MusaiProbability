@@ -20,10 +20,10 @@ namespace Musai
         private bool _isStraightPossible1 = false;
         private bool _straightPossible2Judged = false;
         private bool _isStraightPossible2 = false;
-        public string Hash = string.Empty;
-
+        private string _logType = string.Empty;
         private List<Card> _cardList;
 
+        //测试用
         public HandCard(Card a, Card b)
         {
             _cardList = new List<Card>();
@@ -32,7 +32,6 @@ namespace Musai
             _cardList.Sort(Card.Sort);
 
             InitJudgeCondition();
-            InitHash();
         }
 
         public HandCard(Card a, Card b, Card c)
@@ -44,6 +43,25 @@ namespace Musai
             _cardList.Sort(Card.Sort);
 
             InitJudgeCondition();
+        }
+
+        public HandCard(List<Card> list)
+        {
+            _cardList = list;
+            //传入的List有序
+            InitJudgeCondition();
+        }
+
+        public string LogType
+        {
+            get
+            {
+                if(_logType == string.Empty)
+                {
+                    _logType = GetLogType();
+                }
+                return _logType;
+            }
         }
 
         public bool IsStraightPossible1
@@ -80,7 +98,7 @@ namespace Musai
             }
         }
 
-        private void InitJudgeCondition()
+        public void InitJudgeCondition()
         {
             int sum = 0;
             int point = int.MinValue;
@@ -109,20 +127,20 @@ namespace Musai
             JudgeStraight(JokerCount, pointList, ref IsStraight);
         }
 
-        private void InitHash()
+        private string GetLogType()
         {
             LogKind logKind = LogKindJudgement.GetLogKind(this);
             if(logKind == LogKind.twoJoker)
             {
-                Hash = "双王";
+                return "双王";
             }
             else if(logKind ==LogKind.oneJoker)
             {
-                Hash = "单王";
+                return "单王";
             }
             else
             {
-                Hash = string.Format("个位:{0} 牌型:{1}", OnesDigit.ToString(), ((int)logKind).ToString());
+                return string.Format("个位:{0} 牌型:{1}", OnesDigit.ToString(), ((int)logKind).ToString());
             }
         }
 
