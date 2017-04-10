@@ -7,6 +7,7 @@ namespace Musai
 {
     class Program
     {
+        public static Stopwatch sw = new Stopwatch();
         static void Main(string[] args)
         {
             TestUnit.Singleton.Test();
@@ -17,7 +18,7 @@ namespace Musai
             sp.Start();
             Poker poker = Poker.Singleton;
             //一千万耗时5分钟以上
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 1; i++)
             {
                 spForShuffle.Start();
                 poker.Shuffle();
@@ -38,8 +39,9 @@ namespace Musai
 
             //Console.WriteLine("洗牌耗时:" + spForShuffle.ElapsedMilliseconds);
             Console.WriteLine("获取Wrapper耗时:" + spForGetWrapper.ElapsedMilliseconds);
-            Console.WriteLine("sw:" + HandCardPool.sw.ElapsedMilliseconds);
-            Console.WriteLine("sw1:" + HandCardPool.sw1.ElapsedMilliseconds);
+            Console.WriteLine("排序耗时:" + sw.ElapsedMilliseconds);
+            Console.WriteLine("hash耗时:" + HandCardPool.sw.ElapsedMilliseconds);
+            Console.WriteLine("创建结果耗时:" + HandCardPool.sw1.ElapsedMilliseconds);
             //Console.WriteLine("比较记录耗时:" + spForLog.ElapsedMilliseconds);
             Console.WriteLine("游戏总耗时:" + sp.ElapsedMilliseconds);
             Console.Read();
@@ -47,19 +49,43 @@ namespace Musai
 
         private static LogWrapper GetLogWrapper(Poker poker)
         {
-            Card a, b, c;
-            a = poker.GetCard();
-            b = poker.GetCard();
-            c = poker.GetCard();
+            sw.Start();
+            var a = poker.GetCard();
+            var b = poker.GetCard();
+            var c = poker.GetCard();
+            //List<Card> twoCardList = new List<Card>() { poker.GetCard(), poker.GetCard() };
+            List<Card> twoCardList = new List<Card>() { a, b, c };
+            twoCardList.Sort(Card.Sort1);
 
-            List<Card> twoCardList = new List<Card>() { a, b };
+            List<Card> twoCardList1 = new List<Card>() { a, b };
+            Card.SortTwoCardList(twoCardList1);
+            Card.InsertTwoCardList(twoCardList, poker.GetCard());
+            if((twoCardList[0] == twoCardList1[0]) &&
+                (twoCardList[1] == twoCardList1[1]) &&
+                (twoCardList[2] == twoCardList1[2]))
+            {
+
+            }
+            else
+            {
+                Console.WriteLine("sort error");
+                Console.WriteLine(twoCardList[0]);
+                Console.WriteLine(twoCardList1[0]);
+                Console.WriteLine(twoCardList[1]);
+                Console.WriteLine(twoCardList1[1]);
+            }
+            sw.Stop();
             HandCardResult resultOfTwoCard;
             string logType;
             HandCardPool.Get(twoCardList, out resultOfTwoCard, out logType);
 
-            List<Card> threeCardList = new List<Card>() { a, b, c };
+            sw.Start();
+            List<Card> threeCardList = new List<Card>() { twoCardList[0], twoCardList[1], poker.GetCard()};
+            threeCardList.Sort(Card.Sort1);
+            //Card.InsertTwoCardList(threeCardList, poker.GetCard());
+            sw.Stop();
             HandCardResult resultOfThreeCard;
-            HandCardPool.Get(threeCardList, out resultOfThreeCard, out logType);
+            HandCardPool.Get(threeCardList, out resultOfThreeCard);
 
             return new LogWrapper(logType, resultOfTwoCard, resultOfThreeCard);
         }

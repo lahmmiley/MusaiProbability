@@ -7,7 +7,6 @@ using System.Threading.Tasks;
 
 namespace Musai
 {
-
     public static class HandCardPool
     {
         public class Wrapper
@@ -23,17 +22,17 @@ namespace Musai
 
         public static void Get(List<Card> cardList, out HandCardResult result, out string logType)
         {
+            sw.Start();
             int hash = GetHash(cardList);
+            sw.Stop();
             if (!_dict.ContainsKey(hash))
             {
                 sw1.Start();
                 Wrapper wrapper = new Wrapper();
                 HandCard handCard = new HandCard(cardList);
                 wrapper.LogType = handCard.LogType;
-                //logType = handCard.LogType;
                 HandCardResult handCardResult = CardLevelJudgement.GetHandCardResult(handCard);
                 wrapper.Result = handCardResult;
-                //result = handCardResult;
                 _dict.Add(hash, wrapper);
                 sw1.Stop();
             }
@@ -43,13 +42,14 @@ namespace Musai
 
         public static void Get(List<Card> cardList, out HandCardResult result)
         {
+            sw.Start();
             int hash = GetHash(cardList);
+            sw.Stop();
             if (!_dict.ContainsKey(hash))
             {
                 Wrapper wrapper = new Wrapper();
                 HandCard handCard = new HandCard(cardList);
                 HandCardResult handCardResult = CardLevelJudgement.GetHandCardResult(handCard);
-                //result = handCardResult;
                 wrapper.Result = handCardResult;
                 _dict.Add(hash, wrapper);
             }
@@ -58,75 +58,14 @@ namespace Musai
 
         private static int GetHash(List<Card> cardList)
         {
-            sw1.Start();
-            //cardList.Sort(Card.Sort);
-            Sort(cardList);
-            sw1.Stop();
-            sw.Start();
-            int hash = 0;
             if(cardList.Count == 2)
             {
-                hash = cardList[0].GetHash() + 100 * cardList[1].GetHash();
+                return cardList[0].GetHashCode() * 100 + cardList[1].GetHashCode();
             }
             else
             {
-                hash = cardList[0].GetHash() + 100 * cardList[1].GetHash() + 10000 * cardList[2].GetHash();
+                return cardList[0].GetHashCode() * 10000 + cardList[1].GetHashCode() * 100 + cardList[2].GetHashCode();
             }
-            sw.Stop();
-            return hash;
-        }
-
-        public static bool Larger(Card x, Card y)
-        {
-            if((int)x.CardKind < (int)y.CardKind)
-            {
-                return true;
-            }
-            else if((int)x.CardKind == (int)y.CardKind)
-            {
-                if(x.Point > y.Point)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static void Sort(List<Card> list)
-        {
-            if(list.Count == 2)
-            {
-                if(Larger(list[0], list[1]))
-                {
-                    Swap(list, 0, 1);
-                }
-            }
-            else
-            {
-                //TODO
-                if(Larger(list[0], list[1]))
-                {
-                    Swap(list, 0, 1);
-                    if(Larger(list[1], list[2]))
-                    {
-                        Swap(list, 1, 2);
-                    }
-                }
-                else
-                {
-                    if(Larger(list[1], list[2]))
-                    {
-                        Swap(list, 1, 2);
-                    }
-                }
-            }
-        }
-        
-        private static void Swap(List<Card> list, int x, int y)
-        {
-            Card temp = list[x];
-            list[x] = list[y];
-            list[y] = temp;
         }
     }
 }
