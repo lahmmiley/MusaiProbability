@@ -69,7 +69,7 @@ namespace Musai
             LogResult(result, GetOdds(result, logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfThreeCard), resultA.ThreeCard, resultB.ThreeCard);
         }
 
-        private static int GetOdds(Judger.Result result, HandCardResult a, HandCardResult b)
+        public static int GetOdds(Judger.Result result, HandCardResult a, HandCardResult b)
         {
             int odds = int.MinValue;
             if (result == Judger.Result.win)

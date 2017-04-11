@@ -16,10 +16,11 @@ namespace Musai
 
         public HandCardResult() { }
 
-        public HandCardResult(CardLevel level, int onesDigit = INVALID_VALUE)
+        public HandCardResult(CardLevel level, int onesDigit = INVALID_VALUE, int odds = INVALID_VALUE)
         {
             this.Level = level;
             this.OnesDigit = onesDigit;
+            this.Odds = odds;
         }
 
 

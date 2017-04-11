@@ -206,18 +206,18 @@ namespace Test
         public bool TestJudger()
         {
             if(
-                TestJudge(new HandCardResult(CardLevel.twoJoker), new HandCardResult(CardLevel.straightFlush), Judger.Result.win) &&
+                TestJudge(new HandCardResult(CardLevel.twoJoker, -1, 10), new HandCardResult(CardLevel.straightFlush), Judger.Result.win, 10) &&
                 TestJudge(new HandCardResult(CardLevel.straightFlush), new HandCardResult(CardLevel.straightFlush), Judger.Result.draw) &&
-                TestJudge(new HandCardResult(CardLevel.straightFlush), new HandCardResult(CardLevel.twoJoker), Judger.Result.lose) &&
-                TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0), new HandCardResult(CardLevel.twoJoker), Judger.Result.win) &&
-                TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0), new HandCardResult(CardLevel.straightFlush), Judger.Result.lose) &&
+                TestJudge(new HandCardResult(CardLevel.straightFlush), new HandCardResult(CardLevel.twoJoker, -1, 10), Judger.Result.lose, 10) &&
+                TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0, 10), new HandCardResult(CardLevel.twoJoker), Judger.Result.win, 10) &&
+                TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0), new HandCardResult(CardLevel.straightFlush, 0, 7), Judger.Result.lose, 7) &&
                 TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0), new HandCardResult(CardLevel.onesDigitIsZero, 0), Judger.Result.draw) &&
-                TestJudge(new HandCardResult(CardLevel.other, 1), new HandCardResult(CardLevel.onesDigitIsZero, 0), Judger.Result.win) &&
-                TestJudge(new HandCardResult(CardLevel.other, 3), new HandCardResult(CardLevel.other, 3), Judger.Result.draw) &&
-                TestJudge(new HandCardResult(CardLevel.other, 5), new HandCardResult(CardLevel.other, 3), Judger.Result.win) &&
+                TestJudge(new HandCardResult(CardLevel.other, 1, 2), new HandCardResult(CardLevel.onesDigitIsZero, 0, 1), Judger.Result.win, 2) &&
+                TestJudge(new HandCardResult(CardLevel.other, 3, 3), new HandCardResult(CardLevel.other, 3, 2), Judger.Result.draw) &&
+                TestJudge(new HandCardResult(CardLevel.other, 5, 1), new HandCardResult(CardLevel.other, 3, 3), Judger.Result.win, 1) &&
                 TestJudge(new HandCardResult(CardLevel.straight), new HandCardResult(CardLevel.straight), Judger.Result.draw) &&
-                TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0), new HandCardResult(CardLevel.other, 3), Judger.Result.lose) &&
-                TestJudge(new HandCardResult(CardLevel.threeCardWithTwoJoker), new HandCardResult(CardLevel.twoJoker), Judger.Result.lose)
+                TestJudge(new HandCardResult(CardLevel.onesDigitIsZero, 0), new HandCardResult(CardLevel.other, 3, 3), Judger.Result.lose, 3) &&
+                TestJudge(new HandCardResult(CardLevel.threeCardWithTwoJoker), new HandCardResult(CardLevel.twoJoker, -1, 10), Judger.Result.lose, 10)
             )
             {
                 return true;
@@ -226,12 +226,26 @@ namespace Test
             return false;
         }
 
-        private bool TestJudge(HandCardResult a, HandCardResult b, Judger.Result result)
+        private bool TestJudge(HandCardResult a, HandCardResult b, Judger.Result result, int odds = 0)
         {
             if(result == Judger.Judge(a, b))
             {
-                return true;
+                if(result == Judger.Result.draw)
+                {
+                    return true;
+                }
+                else
+                {
+                    if(odds == Logger.GetOdds(result, a, b))
+                    {
+                        return true;
+                    }
+                }
             }
+            Console.WriteLine(a);
+            Console.WriteLine(b);
+            Console.WriteLine(result);
+            Console.WriteLine(odds);
             return false;
         }
         

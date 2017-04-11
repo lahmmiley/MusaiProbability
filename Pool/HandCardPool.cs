@@ -16,25 +16,17 @@ namespace Musai
         }
         public static Dictionary<int, Wrapper> _dict = new Dictionary<int, Wrapper>();
 
-
-        public static Stopwatch sw = new Stopwatch();
-        public static Stopwatch sw1 = new Stopwatch();
-
         public static void Get(List<Card> cardList, out HandCardResult result, out string logType)
         {
-            sw.Start();
             int hash = GetHash(cardList);
-            sw.Stop();
             if (!_dict.ContainsKey(hash))
             {
-                sw1.Start();
                 Wrapper wrapper = new Wrapper();
                 HandCard handCard = new HandCard(cardList);
                 wrapper.LogType = handCard.LogType;
                 HandCardResult handCardResult = CardLevelJudgement.GetHandCardResult(handCard);
                 wrapper.Result = handCardResult;
                 _dict.Add(hash, wrapper);
-                sw1.Stop();
             }
             result = _dict[hash].Result;
             logType = _dict[hash].LogType;
@@ -42,9 +34,7 @@ namespace Musai
 
         public static void Get(List<Card> cardList, out HandCardResult result)
         {
-            sw.Start();
             int hash = GetHash(cardList);
-            sw.Stop();
             if (!_dict.ContainsKey(hash))
             {
                 Wrapper wrapper = new Wrapper();

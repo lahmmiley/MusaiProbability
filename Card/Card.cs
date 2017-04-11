@@ -93,27 +93,11 @@ namespace Musai
             }
         }
 
-        public static int Sort1(Card x, Card y)
+        public static int Sort(Card x, Card y)
         {
             if(x.GetHashCode() < y.GetHashCode())
             {
                 return -1;
-            }
-            return 1;
-        }
-
-        public static int Sort(Card x, Card y)
-        {
-            if((int)x.CardKind < (int)y.CardKind)
-            {
-                return -1;
-            }
-            else if((int)x.CardKind == (int)y.CardKind)
-            {
-                if(x.Point > y.Point)
-                {
-                    return -1;
-                }
             }
             return 1;
         }
