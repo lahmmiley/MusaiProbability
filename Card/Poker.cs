@@ -21,7 +21,7 @@ namespace Musai
             }
         }
 
-        public const int CARD_NUM = 54;
+        public const int CARD_NUM = 55;
         public static int PER_KIND_NUM = 13;
         private Card[] _cardArray = new Card[CARD_NUM];
         private int _cardIndex = 0;
@@ -36,11 +36,12 @@ namespace Musai
             }
             AddJoker(Card.Kind.redJoker, ref index);
             AddJoker(Card.Kind.blackJoker, ref index);
+            AddJoker(Card.Kind.wildCard, ref index);
         }
 
         private void AddJoker(Card.Kind kind, ref int index)
         {
-            Card joker = new Card(kind, -1);
+            Card joker = new Card(kind);
             _cardArray[index] = joker;
             index++;
         }
@@ -66,7 +67,6 @@ namespace Musai
             return _cardArray[_cardIndex++];
         }
 
-        //private byte[] _seedBytes = new byte[4];
         private int GetRandomSeed()
         {
             RNGCryptoServiceProvider rng = new RNGCryptoServiceProvider();

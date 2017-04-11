@@ -9,6 +9,7 @@ namespace Musai
     public class HandCard
     {
         public bool IsTwoJoker = false;
+        public bool IsThreeJoker = false;
         public int JokerCount = 0;
         public int OnesDigit = 0;
         public bool IsStraight = false;
@@ -123,6 +124,7 @@ namespace Musai
 
             IsInvalid = (JokerCount == 1) && (_cardList.Count == 2);
             IsTwoJoker = (JokerCount == 2) && (_cardList.Count == 2);
+            IsThreeJoker = JokerCount == 3;
             OnesDigit = (JokerCount > 0) ? 9 : sum % 10;
             JudgeStraight(JokerCount, pointList, ref IsStraight);
         }

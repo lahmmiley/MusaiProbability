@@ -33,6 +33,7 @@ namespace Musai
         static CardLevelJudgement()
         {
             _judgeList.Add(new JudgeFunction(CardLevel.invalid, IsInvalid, 2, -1));
+            _judgeList.Add(new JudgeFunction(CardLevel.threeJoker, IsThreeJoker, 3, 15));
             _judgeList.Add(new JudgeFunction(CardLevel.twoJoker, IsTwoJoker, 2, 10));
             _judgeList.Add(new JudgeFunction(CardLevel.tianGongNine, IsTianGongNine, 2, 0));
             _judgeList.Add(new JudgeFunction(CardLevel.tianGongEight, IsTianGongEight, 2, 0));
@@ -97,6 +98,11 @@ namespace Musai
         private static bool IsInvalid(HandCard handCard)
         {
             return handCard.IsInvalid;
+        }
+
+        private static bool IsThreeJoker(HandCard handCard)
+        {
+            return handCard.IsThreeJoker;
         }
 
         private static bool IsTwoJoker(HandCard handCard)

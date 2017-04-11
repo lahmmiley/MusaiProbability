@@ -5,7 +5,8 @@ namespace Musai
 {
     public enum LogKind
     {
-        twoJoker = 1, //双王
+        threeJoker = 1, //三王
+        twoJoker, //双王
         oneJoker, //单王
         straightPossible1AndSameKind,//两张牌相差一点 和 同花
         straightPossible2AndSameKind,//两张牌相差两点 和 同花

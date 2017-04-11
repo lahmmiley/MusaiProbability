@@ -18,6 +18,7 @@ namespace Musai
             club,       //梅花
             redJoker,   //大王
             blackJoker, //小王
+            wildCard,   //万能牌
             invalid,    //无效
         }
 
