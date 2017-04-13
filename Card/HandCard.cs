@@ -261,7 +261,7 @@ namespace Musai
         {
             Card a = _cardList[0];
             Card b = _cardList[1];
-            if(Math.Abs(a.Point - b.Point) == 1)
+            if((b.Point - a.Point) == 1)
             {
                 return true;
             }
@@ -277,7 +277,7 @@ namespace Musai
         {
             Card a = _cardList[0];
             Card b = _cardList[1];
-            if(Math.Abs(a.Point - b.Point) == 2)
+            if((b.Point - a.Point) == 2)
             {
                 return true;
             }

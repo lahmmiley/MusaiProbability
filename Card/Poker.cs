@@ -29,7 +29,8 @@ namespace Musai
         private Poker()
         {
             int index;
-            for(index = 0; index < CARD_NUM - 2; index++)
+            int normalCardNum = PER_KIND_NUM * 4;
+            for(index = 0; index < normalCardNum ; index++)
             {
                 Card card = new Card((Card.Kind)(index / PER_KIND_NUM), index % PER_KIND_NUM + 1);
                 _cardArray[index] = card;

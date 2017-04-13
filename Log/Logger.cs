@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -49,7 +49,8 @@ namespace Musai
     public class Logger
     {
         private static Dictionary<string, Result> _resultDict = new Dictionary<string, Result>();
-        public static void Log(LogWrapper logWrapperA, LogWrapper logWrapperB)
+        private static Random _random = new Random();
+        public static void StaticLog(LogWrapper logWrapperA, LogWrapper logWrapperB)
         {
             Result resultA = GetResult(logWrapperA.TwoCardHash);
             Result resultB = GetResult(logWrapperB.TwoCardHash);
@@ -67,6 +68,61 @@ namespace Musai
 
             result = Judger.Judge(logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfThreeCard);
             LogResult(result, GetOdds(result, logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfThreeCard), resultA.ThreeCard, resultB.ThreeCard);
+        }
+
+        public static void DynamicLog(LogWrapper logWrapperA, LogWrapper logWrapperB)
+        {
+            Result resultA = GetResult(logWrapperA.TwoCardHash);
+            Result resultB = GetResult(logWrapperB.TwoCardHash);
+            resultA.TotalCount += 1;
+            resultB.TotalCount += 1;
+            Judger.Result result;
+            bool aNeedAddCard = NeedAddCard(resultA);
+            bool bNeedAddCard = NeedAddCard(resultB);
+            if(!aNeedAddCard && !bNeedAddCard)
+            {
+                result = Judger.Judge(logWrapperA.ResultOfTwoCard, logWrapperB.ResultOfTwoCard);
+                LogResult(result, GetOdds(result, logWrapperA.ResultOfTwoCard, logWrapperB.ResultOfTwoCard), resultA.TwoCard, resultB.TwoCard);
+            }
+            else if(aNeedAddCard && !bNeedAddCard)
+            {
+                result = Judger.Judge(logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfTwoCard);
+                LogResult(result, GetOdds(result, logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfTwoCard), resultA.ThreeCard, resultB.TwoCard);
+            }
+            else if(!aNeedAddCard && bNeedAddCard)
+            {
+                result = Judger.Judge(logWrapperA.ResultOfTwoCard, logWrapperB.ResultOfThreeCard);
+                LogResult(result, GetOdds(result, logWrapperA.ResultOfTwoCard, logWrapperB.ResultOfThreeCard), resultA.TwoCard, resultB.ThreeCard);
+            }
+            else
+            {
+                result = Judger.Judge(logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfThreeCard);
+                LogResult(result, GetOdds(result, logWrapperA.ResultOfThreeCard, logWrapperB.ResultOfThreeCard), resultA.ThreeCard, resultB.ThreeCard);
+            }
+        }
+
+        private static bool NeedAddCard(Result resultA)
+        {
+            float twoCardMoney = resultA.TwoCard.GetMoney();
+            float threeCardMoney = resultA.ThreeCard.GetMoney();
+            int twoCardInitRatio = 10;
+            int threeCardInitRatio = 10;
+            int diff = (int)((threeCardMoney - twoCardMoney) * 100);
+            if(diff > 0)
+            {
+                threeCardInitRatio += diff;
+            }
+            else
+            {
+                twoCardInitRatio -= diff;
+            }
+            int totalRatio = twoCardInitRatio + threeCardInitRatio;
+            int randomNum = _random.Next() % totalRatio;
+            if(randomNum < twoCardInitRatio)
+            {
+                return false;
+            }
+            return true;
         }
 
         public static int GetOdds(Judger.Result result, HandCardResult a, HandCardResult b)
@@ -112,7 +168,7 @@ namespace Musai
             }
         }
 
-        public static void Save()
+        public static void Save(string fileName)
         {
             string content = @"牌形1:手牌两个王
 牌形2:手牌一个王
@@ -139,7 +195,7 @@ namespace Musai
                     "\t补牌不败:" + FormatRate(result.ThreeCard.GetUnloseRate()) + 
                     "\t补牌收益率:" + FormatRate(result.ThreeCard.GetMoney()) + "\n";
             }
-            FileTool.Write("Statistics.dat", content);
+            FileTool.Write(fileName, content);
         }
 
         private static int KeySort(string x, string y)

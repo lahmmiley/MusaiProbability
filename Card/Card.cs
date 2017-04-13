@@ -57,7 +57,7 @@ namespace Musai
 
         public bool IsJoker()
         {
-            return CardKind == Kind.redJoker || CardKind == Kind.blackJoker;
+            return CardKind == Kind.redJoker || CardKind == Kind.blackJoker || CardKind == Kind.wildCard;
         }
 
         //从小到大

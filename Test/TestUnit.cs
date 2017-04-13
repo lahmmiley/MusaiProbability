@@ -1,4 +1,4 @@
-﻿using Musai;
+using Musai;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,6 +40,11 @@ namespace Test
                 }
 
                 if(!TestJudger())
+                {
+                    break;
+                }
+
+                if(!TestLogKind())
                 {
                     break;
                 }
@@ -99,6 +104,8 @@ namespace Test
         public bool TestHandCardResult()
         {
             if(
+                TestResult(new Card(Card.Kind.redJoker), new Card(Card.Kind.blackJoker), new Card(Card.Kind.wildCard), 
+                    CardLevel.threeJoker, 15) &&
                 TestResult(new Card(Card.Kind.redJoker), new Card(Card.Kind.blackJoker), 
                     CardLevel.twoJoker, 10) &&
                 TestResult(new Card(Card.Kind.redJoker), new Card(Card.Kind.diamonds, 1), 
@@ -176,7 +183,6 @@ namespace Test
             Console.WriteLine("获取HandCardResult错误");
             return false;
         }
-
         private bool TestResult(HandCard handCard, CardLevel level, int odds, int onesDigit = HandCardResult.INVALID_VALUE)
         {
             HandCardResult result = CardLevelJudgement.GetHandCardResult(handCard);
@@ -206,6 +212,7 @@ namespace Test
         public bool TestJudger()
         {
             if(
+                TestJudge(new HandCardResult(CardLevel.threeJoker, -1, 15), new HandCardResult(CardLevel.straightFlush), Judger.Result.win, 15) &&
                 TestJudge(new HandCardResult(CardLevel.twoJoker, -1, 10), new HandCardResult(CardLevel.straightFlush), Judger.Result.win, 10) &&
                 TestJudge(new HandCardResult(CardLevel.straightFlush), new HandCardResult(CardLevel.straightFlush), Judger.Result.draw) &&
                 TestJudge(new HandCardResult(CardLevel.straightFlush), new HandCardResult(CardLevel.twoJoker, -1, 10), Judger.Result.lose, 10) &&
@@ -248,6 +255,57 @@ namespace Test
             Console.WriteLine(odds);
             return false;
         }
-        
+
+        private bool TestLogKind()
+        {
+            if(
+                TestLogKind(new Card(Card.Kind.blackJoker), new Card(Card.Kind.redJoker), LogKind.twoJoker) &&
+                TestLogKind(new Card(Card.Kind.redJoker), new Card(Card.Kind.wildCard), LogKind.twoJoker) &&
+                TestLogKind(new Card(Card.Kind.blackJoker), new Card(Card.Kind.club, 4), LogKind.oneJoker) &&
+                TestLogKind(new Card(Card.Kind.club, 2), new Card(Card.Kind.blackJoker), LogKind.oneJoker) &&
+                TestLogKind(new Card(Card.Kind.club, 3), new Card(Card.Kind.club, 4), LogKind.straightPossible1AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.club, 1), new Card(Card.Kind.club, 13), LogKind.straightPossible1AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.club, 13), new Card(Card.Kind.club, 1), LogKind.straightPossible1AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.club, 3), new Card(Card.Kind.club, 2), LogKind.straightPossible1AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 4), new Card(Card.Kind.diamonds, 2), LogKind.straightPossible2AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 4), new Card(Card.Kind.diamonds, 6), LogKind.straightPossible2AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 1), new Card(Card.Kind.diamonds, 12), LogKind.straightPossible2AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 12), new Card(Card.Kind.diamonds, 1), LogKind.straightPossible2AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 2), new Card(Card.Kind.diamonds, 13), LogKind.straightPossible2AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 13), new Card(Card.Kind.diamonds, 2), LogKind.straightPossible2AndSameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 1), new Card(Card.Kind.club, 13), LogKind.straightPossible1) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 13), new Card(Card.Kind.club, 1), LogKind.straightPossible1) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 11), new Card(Card.Kind.club, 13), LogKind.straightPossible2) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 1), new Card(Card.Kind.club, 12), LogKind.straightPossible2) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 1), new Card(Card.Kind.diamonds, 10), LogKind.sameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 2), new Card(Card.Kind.diamonds, 12), LogKind.sameKind) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 12), new Card(Card.Kind.club, 12), LogKind.samePoint) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 1), new Card(Card.Kind.club, 1), LogKind.samePoint) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 3), new Card(Card.Kind.club, 6), LogKind.other) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 9), new Card(Card.Kind.club, 6), LogKind.other) &&
+                TestLogKind(new Card(Card.Kind.diamonds, 1), new Card(Card.Kind.club, 6), LogKind.other)
+            )
+            {
+                return true;
+            }
+            Console.WriteLine("获取LogKind错误");
+            return false;
+        }
+
+        private bool TestLogKind(Card card1, Card card2, LogKind logKind)
+        {
+            List<Card> twoCardList = new List<Card>() { card1, card2 };
+            Card.SortTwoCardList(twoCardList);
+            HandCard handCard = new HandCard(twoCardList);
+            if( LogKindJudgement.GetLogKind(handCard) == logKind)
+            {
+                return true;
+            }
+            Console.Write(twoCardList[0]);
+            Console.Write(twoCardList[1]);
+            Console.Write(LogKindJudgement.GetLogKind(handCard));
+            return false;
+        }
+
     }
 }
