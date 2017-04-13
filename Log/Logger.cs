@@ -188,8 +188,7 @@ namespace Musai
             {
                 string key = keyList[i];
                 Result result = _resultDict[key];
-                content += string.Format("{0, -15}", key) + "\t统计次数:" + 
-                    string.Format("{0, -6}", result.TotalCount) +
+                content += string.Format("{0, -15}", key) + 
                     "\t两牌不败:" + FormatRate(result.TwoCard.GetUnloseRate()) + 
                     "\t两牌收益率:" + FormatRate(result.TwoCard.GetMoney()) + 
                     "\t补牌不败:" + FormatRate(result.ThreeCard.GetUnloseRate()) + 
