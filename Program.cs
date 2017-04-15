@@ -16,20 +16,22 @@ namespace Musai
             TestUnit.Singleton.Test();
             spForTest.Stop();
             Poker poker = Poker.Singleton;
-            for (int i = 0; i < 10000000; i++)
+            int totalCount = 100000000;
+            int staticCount = totalCount / 1000;
+            for (int i = 0; i < totalCount; i++)
             {
                 poker.Shuffle();
                 for (int j = 0; j < 4; j++)
                 {
                     LogWrapper a = GetLogWrapper(poker);
                     LogWrapper b = GetLogWrapper(poker);
-                    if(i < 1000000)
+                    if(i < staticCount)
                     {
                         Logger.StaticLog(a, b);
                     }
                     else
                     {
-                        if(i == 1000000)
+                        if(i == staticCount)
                         {
                             Logger.Save("静态统计数据.dat");
                         }

@@ -188,11 +188,9 @@ namespace Musai
             {
                 string key = keyList[i];
                 Result result = _resultDict[key];
-                content += string.Format("{0, -15}", key) + 
-                    "\t两牌不败:" + FormatRate(result.TwoCard.GetUnloseRate()) + 
-                    "\t两牌收益率:" + FormatRate(result.TwoCard.GetMoney()) + 
-                    "\t补牌不败:" + FormatRate(result.ThreeCard.GetUnloseRate()) + 
-                    "\t补牌收益率:" + FormatRate(result.ThreeCard.GetMoney()) + "\n";
+                content += string.Format("{0, -2} |{1, -14}", i, key) + 
+                    "\t|" + FormatRate(result.TwoCard.GetMoney()) + 
+                    "\t|" + FormatRate(result.ThreeCard.GetMoney()) + "\n";
             }
             FileTool.Write(fileName, content);
         }
